@@ -1,10 +1,12 @@
 # LivingThread — Two-minute demo
 
-**Recording plan; final video pending.** The original venue-change workflow passed real Slack/Docs/Gmail acceptance, and the separate reviewed Slack question also passed. These earlier checks do not mean the next rehearsal or recording has already succeeded. See [live acceptance](LIVE_ACCEPTANCE.md).
+**Original recording plan; a 1:55 review edit now exists.** The entrant recorded the Harbor workflow and a continuation with a later Room 503 change. The actual edit uses English male AI narration and follows [the demo edit record](VIDEO_EDIT.md). The Cedar narration below remains the original operator plan; publication is pending. See [live acceptance](LIVE_ACCEPTANCE.md) for the earlier technical checks.
 
 The central story is visible: **LivingThread shows up inside existing work without waiting for a comparison prompt.** It notices related information drifting before the user has assembled a task for an assistant.
 
 ## Before pressing Record
+
+**Silent, longer recording is welcome.** The operator does not need to narrate or finish the raw take within two minutes. Follow [silent capture and post-production](VIDEO_PRODUCTION.md); the final edit will add English AI narration and captions.
 
 Follow the detailed [operator guide](OPERATOR_GUIDE.md). Use [Take 01: Harbor](demo/take-01-rehearsal.md) for the first untimed rehearsal, [Take 02: Cedar](demo/take-02-recording.md) for recording, and [Take 03: Maple](demo/take-03-retake.md) for a fresh retake. Each pack contains all application text.
 
