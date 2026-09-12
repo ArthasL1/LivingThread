@@ -31,6 +31,7 @@
     .operation{display:flex;gap:8px;align-items:flex-start;border-radius:8px;padding:9px 11px;margin-top:7px;background:#eef5ec;font-size:11px;color:#38583a}.operation.failed,.operation.error,.operation.uncertain{background:#fff2df;color:#8b612b}.operation.pending,.operation.running,.operation.executing{background:#eef1f6;color:#516a80}.operation-title{font-weight:650;margin-bottom:2px}.error{margin-top:10px;padding:9px 11px;background:#fff1e7;border:1px solid #f0d8be;border-radius:8px;color:#8c5d31;font-size:11px;overflow-wrap:anywhere}
     .pill{display:flex;align-items:center;gap:8px;background:#fffefb;border:1px solid #dce7df;border-radius:99px;box-shadow:0 3px 15px #133d2e12;padding:8px 12px;color:#57745f;font-size:11px}.dot{display:inline-block;width:6px;height:6px;border-radius:100%;background:#4b9b72}.dot.offline{background:#cf9453}.pulse{animation:lt-pulse 1.5s ease-in-out infinite}@keyframes lt-pulse{50%{opacity:.35}}@media(prefers-reduced-motion:reduce){.pulse{animation:none}}
     .paging{display:flex;align-items:center;gap:6px;margin-left:5px;font-size:10px;color:#7b8a7c}.paging button{font-size:14px;width:21px;height:23px;border-radius:5px;color:#47684f;background:#eef3e9}.muted-note{font-size:11px;color:#71816e;margin:10px 0 0}.badge{font-size:10px;font-weight:600;color:#2e7554;padding:2px 6px;background:#e9f3e5;border-radius:5px}
+    button.pill:hover{background:#f0f6ed}.result-link{display:block;width:100%;padding:10px 17px;border-top:1px solid #e7ece3;background:#f4f8ef;text-align:left;font-size:11px;font-weight:600;color:#3a7152}.result-link:hover{background:#eaf3e4}.result-progress{padding:11px 12px;margin:11px 0 0;border-radius:10px;background:#edf5e9;color:#426741;font-size:12px}.result-progress.attention{background:#fff2df;color:#8b612b}.new-finding{width:100%;text-align:left;border:1px solid #e3d4b6;border-radius:9px;background:#fff7e7;padding:10px 12px;color:#89652a;font-size:12px;margin-top:13px}.new-finding span{display:block;font-size:10px;margin-top:3px;color:#887757}.receipt-toggle{margin-top:12px;color:#64775f;font-size:11px}.receipt-toggle summary{cursor:pointer}.receipt-wording{margin-top:8px;border-left:2px solid #d7e3d0;padding:3px 0 3px 9px;color:#506249;font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere}.receipt-wording strong{display:block;font-size:10px;margin-bottom:4px}.result-footer{display:flex;gap:8px;align-items:center;justify-content:space-between}.operation.queued{background:#eef1f6;color:#516a80}
   `;
   shadow.append(style);
   const mount = document.createElement('div');
@@ -41,11 +42,14 @@
   let expanded = false;
   let showClarification = false;
   let currentId = null;
+  let viewMode = 'finding';
+  let resultGroupId = null;
   let busy = false;
   let localError = '';
   let lastSignature = '';
   let clarificationText = '';
   const selected = new Map();
+  const reviewedGroups = new Map();
 
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -64,7 +68,9 @@
 
   function observations() { return Array.isArray(state.observations) ? state.observations : Object.values(state.observations || {}); }
   function source(id) { return observations().find(item => item.id === id); }
+  function receiptSource(id, groupId) { return source(id) || reviewedGroups.get(groupId)?.sources.find(item => item.id === id); }
   function appName(app) { return ({ gmail: 'Gmail', docs: 'Google Docs', slack: 'Slack' })[app] || 'Source'; }
+  function operationApp(operation) { return appName(receiptSource(operation.sourceId, operation.findingId)?.app || operation.sourceId?.split(':')[0]); }
   function isLocal(id) {
     if (LT.getAnchor?.(id)) return true;
     const observation = source(id);
@@ -78,6 +84,55 @@
 
   function relevantFindings() {
     return (state.findings || []).filter(finding => !['dismissed', 'resolved', 'superseded'].includes(finding.status) && [...(finding.evidence || []), ...(finding.actions || [])].some(item => isLocal(item.sourceId)));
+  }
+
+  function isRelevantOperation(operation) {
+    // Gmail composer IDs do not survive a full page reload. Without a durable draft
+    // identity we cannot safely recover its old receipt; Docs identities remain stable.
+    // Neither an app prefix nor a shared inbox URL establishes operation relevance.
+    return isLocal(operation.sourceId);
+  }
+
+  function relevantGroups() {
+    const operations = state.operations || [];
+    const ids = new Set(operations.filter(isRelevantOperation).map(operation => operation.findingId));
+    for (const group of reviewedGroups.values()) if (group.localSourceIds.some(isLocal)) ids.add(group.id);
+    return [...ids].map(id => {
+      const stored = reviewedGroups.get(id);
+      const groupOperations = operations.filter(operation => operation.findingId === id);
+      return { id, stored, operations: groupOperations, event: stored?.event || 'Reviewed actions',
+        order: stored?.approvedAt || Math.max(0, ...groupOperations.map(operation => new Date(operation.createdAt || operation.finishedAt || 0).getTime() || operations.indexOf(operation))) };
+    }).sort((a, b) => b.order - a.order);
+  }
+
+  function rememberApproval(finding, actionIds) {
+    const actions = (finding.actions || []).filter(action => actionIds.includes(action.id)).map(action => ({ ...action }));
+    const sourceIds = [...new Set([...actions, ...(finding.evidence || [])].map(item => item.sourceId))];
+    const group = { id: finding.id, event: finding.event, actions, localSourceIds: sourceIds.filter(isLocal),
+      sources: sourceIds.map(source).filter(Boolean).map(item => ({ id: item.id, app: item.app, title: item.title, url: item.url })),
+      approvedAt: Date.now(), requestStatus: 'requesting' };
+    reviewedGroups.set(group.id, group);
+    resultGroupId = group.id;
+    viewMode = 'results';
+    expanded = true;
+    showClarification = false;
+    return group;
+  }
+
+  function showResults(groupId) {
+    resultGroupId = groupId;
+    viewMode = 'results';
+    expanded = true;
+    showClarification = false;
+    render(true);
+  }
+
+  function showFinding(findingId) {
+    currentId = findingId;
+    viewMode = 'finding';
+    expanded = true;
+    showClarification = false;
+    render(true);
   }
 
   function safeLink(url) {
@@ -233,11 +288,66 @@
       const good = ['succeeded', 'success', 'completed', 'verified'].includes(operation.status);
       card.append(el('span', '', good ? '✓' : ['failed', 'error', 'uncertain'].includes(operation.status) ? '!' : '·'));
       const details = el('div');
-      details.append(el('div', 'operation-title', `${appName(source(operation.sourceId)?.app)} · ${operation.status || 'pending'}`));
+      details.append(el('div', 'operation-title', `${operationApp(operation)} · ${operation.status || 'pending'}`));
       details.append(el('div', '', operation.message || 'Waiting for verification.'));
       card.append(details);
       parent.append(card);
     }
+  }
+
+  function renderResults(group, findings, groups) {
+    const shell = el('section', 'shell');
+    shell.setAttribute('aria-label', 'LivingThread reviewed action results');
+    const header = el('div', 'header');
+    addBrand(header, true);
+    const content = el('div', 'content');
+    const intro = el('div', 'intro');
+    const complete = group.operations.filter(operation => ['succeeded', 'success', 'completed', 'verified'].includes(operation.status)).length;
+    const pending = group.operations.some(operation => ['queued', 'pending', 'running', 'executing'].includes(operation.status));
+    const attention = group.operations.some(operation => ['failed', 'error', 'uncertain'].includes(operation.status));
+    const expected = Math.max(group.operations.length, group.stored?.actions.length || 0);
+    const missing = group.operations.length < expected;
+    const noResults = group.operations.length === 0;
+    const title = noResults ? group.stored?.requestStatus === 'failed' ? 'Approval needs attention' : 'Your approval is being checked'
+      : pending || missing ? 'Applying your reviewed changes' : attention ? 'Some actions need attention' : 'Reviewed actions completed';
+    intro.append(el('div', 'eyebrow', 'Your approved action group'), el('h2', 'event', group.event), el('p', 'summary', title));
+    let progress = `${complete} of ${expected} actions verified.`;
+    if (noResults) progress = group.stored?.requestStatus === 'failed' ? 'The approval was not confirmed. No operation result is available yet.'
+      : group.stored?.requestStatus === 'accepted' ? 'Approval accepted. Waiting for operation status.' : 'Waiting for the service to accept the exact actions you reviewed.';
+    intro.append(el('div', `result-progress${attention || group.stored?.requestStatus === 'failed' ? ' attention' : ''}`, progress));
+    content.append(intro);
+    addOperations(content, group.id);
+    if (group.stored?.actions.length) {
+      const receipt = el('details', 'receipt-toggle');
+      receipt.append(el('summary', '', 'What you approved'));
+      for (const action of group.stored.actions) {
+        const item = el('div', 'receipt-wording');
+        item.append(el('strong', '', appName(receiptSource(action.sourceId, group.id)?.app)),
+          document.createTextNode(action.kind === 'slack_message' ? action.text : `${action.before}\n→ ${action.after}`));
+        receipt.append(item);
+      }
+      content.append(receipt);
+    }
+    const checkNote = state.connected === false ? 'The service is offline. These are its last received operation results.'
+      : state.error ? 'The latest cross-app check is unavailable. Operation results remain listed above.'
+      : state.checking ? 'Checking related details again…'
+      : findings.length ? `${findings.length} ${findings.length === 1 ? 'finding still needs' : 'findings still need'} review on this page.`
+      : 'No open finding is currently reported for this page.';
+    content.append(el('p', 'muted-note', checkNote));
+    if (findings.length) {
+      const next = button(`Review ${findings.length === 1 ? 'the current finding' : `${findings.length} current findings`} →`, 'new-finding', () => showFinding(findings[0].id));
+      next.append(el('span', '', findings[0].summary || findings[0].event));
+      content.append(next);
+    }
+    if (localError || state.error) content.append(el('div', 'error', localError || state.error));
+    const footer = el('div', 'footer result-footer');
+    footer.append(button('Minimize results', 'text-button', () => { expanded = false; render(true); }));
+    if (groups.length > 1) {
+      const index = groups.findIndex(item => item.id === group.id);
+      footer.append(button('Earlier reviewed actions →', 'text-button', () => showResults(groups[(index + 1) % groups.length].id)));
+    }
+    shell.append(header, content, footer);
+    return shell;
   }
 
   function addClarification(parent, finding) {
@@ -290,9 +400,12 @@
 
   function render(force = false) {
     const findings = relevantFindings();
-    let finding = findings.find(item => item.id === currentId) || findings[0];
-    if (finding) currentId = finding.id;
-    const signature = JSON.stringify({ enabled: state.session?.enabled, connected: state.connected, checking: state.checking, error: state.error, findings, operations: state.operations, expanded, currentId, showClarification, localError, busy, sources: observations().map(item => [item.id, item.stale, item.observedAt, item.coverage]) });
+    const groups = relevantGroups();
+    const group = groups.find(item => item.id === resultGroupId) || groups[0];
+    if (group && !resultGroupId) resultGroupId = group.id;
+    const finding = findings.find(item => item.id === currentId) || findings[0];
+    if (finding && viewMode === 'finding') currentId = finding.id;
+    const signature = JSON.stringify({ enabled: state.session?.enabled, connected: state.connected, checking: state.checking, error: state.error, findings, groups, operations: state.operations, expanded, currentId, resultGroupId, viewMode, showClarification, localError, busy, sources: observations().map(item => [item.id, item.stale, item.observedAt, item.coverage]) });
     if (!force && signature === lastSignature) return;
     // Background polling must not replace a textarea while the user is entering a clarification.
     if (!force && shadow.activeElement?.tagName === 'TEXTAREA') return;
@@ -300,29 +413,26 @@
     mount.replaceChildren();
     host.hidden = !state.session?.enabled;
     if (host.hidden) return;
-    position(finding);
+    const resultAnchor = group ? { actions: group.operations.length ? group.operations : group.stored?.actions || [] } : null;
+    position(viewMode === 'results' && group ? resultAnchor : finding);
+    if (expanded && group && (viewMode === 'results' || !finding)) {
+      mount.append(renderResults(group, findings, groups));
+      return;
+    }
     if (!finding) {
-      const pill = el('div', 'pill');
+      const pill = group ? button('', 'pill', () => showResults(group.id), 'Review recent action results') : el('div', 'pill');
       const dot = el('span', `dot${state.connected === false ? ' offline' : ''}${state.checking ? ' pulse' : ''}`);
-      pill.append(dot, el('span', '', state.connected === false ? 'LivingThread · Service offline' : state.error ? 'LivingThread · Check paused' : state.checking ? 'LivingThread · Checking details' : 'LivingThread · Watching this session'));
+      const pending = group?.operations.some(operation => ['queued', 'pending', 'running', 'executing'].includes(operation.status));
+      pill.append(dot, el('span', '', group ? pending ? 'LivingThread · Actions in progress →' : 'LivingThread · Review results →' : state.connected === false ? 'LivingThread · Service offline' : state.error ? 'LivingThread · Check paused' : state.checking ? 'LivingThread · Checking details' : 'LivingThread · Watching this session'));
       pill.title = state.error || 'Related information is checked automatically within your enabled work session.';
-      const previousOps = (state.operations || []).filter(operation => operation.findingId === currentId);
-      if (expanded && previousOps.length) {
-        const shell = el('section', 'shell');
-        const header = el('div', 'header'); addBrand(header, true);
-        const content = el('div', 'content');
-        content.append(el('div', 'intro', 'Your reviewed actions'));
-        addOperations(content, currentId);
-        if (localError) content.append(el('div', 'error', localError));
-        shell.append(header, content); mount.append(shell);
-      } else mount.append(pill);
+      mount.append(pill);
       return;
     }
 
     const shell = el('section', 'shell');
     shell.setAttribute('aria-label', 'LivingThread context review');
     if (!expanded) {
-      const notice = button('', 'notice', () => { expanded = true; render(true); });
+      const notice = button('', 'notice', () => showFinding(finding.id));
       addBrand(notice);
       notice.append(el('div', 'eyebrow', finding.kind === 'pending' ? 'An arrangement needs confirmation' : 'A detail may be out of date'));
       notice.append(el('div', 'event', finding.event || 'Connected details'));
@@ -331,6 +441,7 @@
       footer.append(el('span', '', 'Review the connection →'), el('span', 'count', `${new Set((finding.evidence || []).map(item => source(item.sourceId)?.app).filter(Boolean)).size} apps`));
       notice.append(footer);
       shell.append(notice);
+      if (group) shell.append(button('Review your recent action results →', 'result-link', () => showResults(group.id)));
     } else {
       const header = el('div', 'header');
       addBrand(header, true, findings);
@@ -348,7 +459,16 @@
       if (finding.actions?.length) {
         const approve = button(approveLabel(finding), 'primary', () => {
           const ids = selectedIds(finding);
-          if (ids.length) run(() => LT.approve(finding.id, ids));
+          if (ids.length) {
+            const approval = rememberApproval(finding, ids);
+            run(async () => {
+              try {
+                const result = await LT.approve(finding.id, ids);
+                approval.requestStatus = result?.ok === false || result?.error ? 'failed' : 'accepted';
+                return result;
+              } catch (error) { approval.requestStatus = 'failed'; throw error; }
+            });
+          }
         });
         approve.id = 'lt-approve';
         approve.disabled = busy || !selectedIds(finding).length;
@@ -364,6 +484,7 @@
       clarify.disabled = dismiss.disabled = busy;
       options.append(clarify, dismiss);
       footer.append(options);
+      if (group) footer.append(button('Review your recent action results →', 'text-button', () => showResults(group.id)));
       shell.append(header, content, footer);
     }
     mount.append(shell);

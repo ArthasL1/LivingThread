@@ -290,6 +290,125 @@
         "requiredReplacementSources": [],
         "forbidSlackMessages": true
       }
+    },
+    {
+      "id": "compatible-specificity",
+      "name": "A detailed venue and paraphrased floor-only descriptions agree",
+      "expected": "No finding or action: Level 3, Room 301 and third floor are compatible; omitted room and year details are not disagreements.",
+      "observations": [
+        {
+          "id": "slack:original",
+          "app": "slack",
+          "resourceId": "slack:original",
+          "url": "https://example.test/slack/slack%3Aoriginal",
+          "title": "Atlas customer demo",
+          "text": "Confirmed: the Atlas customer demo is on 18 September 2026, 15:00–15:30 HKT, at Level 3, Room 301. Jamie will lead the product walkthrough.",
+          "observedAt": "2026-09-12T03:30:00.000Z",
+          "coverage": "full",
+          "editable": false,
+          "context": {
+            "channelId": "C_SYNTHETIC_ATLAS",
+            "threadTs": "1789180000.000100"
+          }
+        },
+        {
+          "id": "docs:atlas-brief",
+          "app": "docs",
+          "resourceId": "docs:atlas-brief",
+          "url": "https://example.test/docs/docs%3Aatlas-brief",
+          "title": "Atlas demo brief",
+          "text": "The Atlas customer demo is scheduled for 18 September 2026, from 15:00 to 15:30 HKT. The demo will take place on the third floor. Jamie will lead the product walkthrough.",
+          "observedAt": "2026-09-12T03:30:00.000Z",
+          "coverage": "partial",
+          "editable": true,
+          "context": {}
+        },
+        {
+          "id": "gmail:atlas-draft",
+          "app": "gmail",
+          "resourceId": "gmail:atlas-draft",
+          "url": "https://example.test/gmail/gmail%3Aatlas-draft",
+          "title": "Atlas demo: arrival details for 18 September 2026",
+          "text": "Subject: Atlas demo: arrival details for 18 September\nHi Morgan,\nWe look forward to the Atlas customer demo on 18 September, from 15:00 to 15:30 HKT. When you arrive, head to the third floor. Jamie will meet you there.\nBest,\nJamie",
+          "observedAt": "2026-09-12T03:30:00.000Z",
+          "coverage": "full",
+          "editable": true,
+          "context": {}
+        }
+      ],
+      "clarifications": [],
+      "checks": {
+        "kind": "none",
+        "requiredReplacementSources": [],
+        "forbidSlackMessages": true
+      }
+    },
+    {
+      "id": "resolved-change-with-history",
+      "name": "Current sources align after a confirmed change while old conversation history remains",
+      "expected": "No finding or action: the current Docs and Gmail adopt Level 5, Room 502; the explicitly superseded Level 3 Slack message is history.",
+      "observations": [
+        {
+          "id": "slack:original",
+          "app": "slack",
+          "resourceId": "slack:original",
+          "url": "https://example.test/slack/slack%3Aoriginal",
+          "title": "Atlas customer demo",
+          "text": "Confirmed: the Atlas customer demo is on 18 September 2026, 15:00-15:30 HKT, at Level 3, Room 301. Jamie will lead the product walkthrough.",
+          "observedAt": "2026-09-12T03:30:00.000Z",
+          "coverage": "full",
+          "editable": false,
+          "context": {
+            "channelId": "C_SYNTHETIC_ATLAS",
+            "threadTs": "1789180000.000100"
+          }
+        },
+        {
+          "id": "slack:confirmed-change",
+          "app": "slack",
+          "resourceId": "slack:confirmed-change",
+          "url": "https://example.test/slack/slack%3Aconfirmed-change",
+          "title": "Atlas customer demo",
+          "text": "Confirmed with facilities: the Atlas customer demo on 18 September 2026 has moved to Level 5, Room 502. The time remains 15:00-15:30 HKT.",
+          "observedAt": "2026-09-12T03:30:05.000Z",
+          "coverage": "full",
+          "editable": false,
+          "context": {
+            "channelId": "C_SYNTHETIC_ATLAS",
+            "threadTs": "1789180000.000100"
+          }
+        },
+        {
+          "id": "docs:atlas-brief",
+          "app": "docs",
+          "resourceId": "docs:atlas-brief",
+          "url": "https://example.test/docs/docs%3Aatlas-brief",
+          "title": "Atlas demo brief",
+          "text": "The Atlas customer demo is scheduled for 18 September 2026, from 15:00 to 15:30 HKT. The demo will take place on the Level 5, Room 502. Jamie will lead the product walkthrough.",
+          "observedAt": "2026-09-12T03:31:00.000Z",
+          "coverage": "full",
+          "editable": true,
+          "context": {}
+        },
+        {
+          "id": "gmail:atlas-draft",
+          "app": "gmail",
+          "resourceId": "gmail:atlas-draft",
+          "url": "https://example.test/gmail/gmail%3Aatlas-draft",
+          "title": "Atlas demo: arrival details for 18 September 2026",
+          "text": "Subject: Atlas demo: arrival details for 18 September 2026\nHi Morgan,\nWe look forward to the Atlas customer demo on 18 September 2026, from 15:00 to 15:30 HKT. When you arrive, head to the Level 5, Room 502. Jamie will meet you there.\nBest,\nJamie",
+          "observedAt": "2026-09-12T03:31:00.000Z",
+          "coverage": "full",
+          "editable": true,
+          "context": {}
+        }
+      ],
+      "clarifications": [],
+      "checks": {
+        "kind": "none",
+        "requiredReplacementSources": [],
+        "forbidSlackMessages": true
+      }
     }
   ]
 }

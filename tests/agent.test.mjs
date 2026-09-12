@@ -33,7 +33,7 @@ const envelope = (result) => ({
 });
 const transport = (result) => async () => ({ ok: true, status: 200, json: async () => envelope(result) });
 const analyze = (result, options = {}, observations = structuredClone(sources)) => analyzeObservations(observations, {
-  config, fetchImpl: transport(result), ...options,
+  config, fetchImpl: transport(result), retryDelayMs: 0, ...options,
 });
 const rejectsCode = (promise, code) => assert.rejects(promise, (error) => {
   assert.ok(error instanceof AgentError);
@@ -74,6 +74,7 @@ test('sends one strict Azure Responses request and returns grounded, stable acti
   assert.equal(first.findings[0].actions[0].id, second.findings[0].actions[0].id);
   assert.deepEqual(first.usage, { input_tokens: 250, output_tokens: 120, total_tokens: 370 });
   assert.equal(first.model, config.deployment);
+  assert.equal(first.attempts, 1);
   assert.ok(first.latencyMs >= 0);
 });
 
@@ -83,6 +84,7 @@ test('an empty, completed analysis is distinct from a model failure', async () =
   const result = await analyzeObservations([sources[0]], { config, fetchImpl: async () => { called = true; } });
   assert.equal(called, false);
   assert.deepEqual(result.findings, []);
+  assert.equal(result.attempts, 0);
 });
 
 test('rejects hallucinated quotes and unknown source IDs', async () => {
@@ -161,4 +163,99 @@ test('validates credentials configuration, input identity, and size before trans
   await rejectsCode(analyze({}, {}, [sources[0], sources[0]]), 'INVALID_INPUT');
   const large = structuredClone(sources); large[1].text = 'x'.repeat(50_001);
   await rejectsCode(analyze({}, {}, large), 'INPUT_LIMIT');
+});
+
+function rejectWhenAborted(signal) {
+  return new Promise((_resolve, reject) => {
+    const keepAlive = setTimeout(() => reject(new Error('Unexpected test timeout.')), 1_000);
+    signal.addEventListener('abort', () => {
+      clearTimeout(keepAlive);
+      reject(new Error(config.apiKey));
+    }, { once: true });
+  });
+}
+
+test('retries a timed-out analysis once and includes the first attempt and backoff in latency', async () => {
+  let calls = 0;
+  const result = await analyze(null, { timeoutMs: 10, retryDelayMs: 20,
+    fetchImpl: async (_url, { signal }) => {
+      calls += 1;
+      if (calls === 1) return rejectWhenAborted(signal);
+      assert.equal(signal.aborted, false);
+      return { ok: true, json: async () => envelope({ findings: [finding()] }) };
+    } });
+  assert.equal(calls, 2);
+  assert.equal(result.attempts, 2);
+  assert.equal(result.findings.length, 1);
+  assert.ok(result.latencyMs >= 20);
+});
+
+test('retries transport failure once without changing the read-only request', async () => {
+  const bodies = [];
+  const result = await analyze(null, { fetchImpl: async (_url, request) => {
+    bodies.push(request.body);
+    if (bodies.length === 1) throw new Error(config.apiKey);
+    return { ok: true, json: async () => envelope({ findings: [] }) };
+  } });
+  assert.equal(result.attempts, 2);
+  assert.equal(bodies.length, 2);
+  assert.equal(bodies[0], bodies[1]);
+  assert.equal(JSON.parse(bodies[0]).tools, undefined);
+});
+
+test('two failed attempts expose the sanitized failure and never call a third time', async () => {
+  for (const code of ['MODEL_TIMEOUT', 'MODEL_TRANSPORT']) {
+    let calls = 0;
+    await rejectsCode(analyze(null, { timeoutMs: 10, fetchImpl: async (_url, { signal }) => {
+      calls += 1;
+      if (code === 'MODEL_TIMEOUT') return rejectWhenAborted(signal);
+      throw new Error(config.apiKey);
+    } }), code);
+    assert.equal(calls, 2);
+  }
+});
+
+test('cancelling during retry backoff prevents the second provider call', async () => {
+  const controller = new AbortController();
+  let calls = 0;
+  await rejectsCode(analyze(null, { signal: controller.signal, retryDelayMs: 200,
+    fetchImpl: async () => {
+      calls += 1;
+      setTimeout(() => controller.abort('sensitive cancellation reason'), 10);
+      throw new Error(config.apiKey);
+    } }), 'MODEL_CANCELLED');
+  assert.equal(calls, 1);
+});
+
+test('refusal, validation, incomplete output and HTTP failures never retry', async () => {
+  const ungrounded = finding(); ungrounded.evidence[0].quote = 'Invented evidence.';
+  const unsafe = finding(); unsafe.kind = 'pending';
+  const cases = [
+    { code: 'MODEL_REFUSAL', payload: { status: 'completed', output: [{ type: 'message', role: 'assistant', content: [{ type: 'refusal' }] }] } },
+    { code: 'MODEL_FORMAT', payload: envelope({ findings: [], extra: 'unexpected' }) },
+    { code: 'MODEL_GROUNDING', payload: envelope({ findings: [ungrounded] }) },
+    { code: 'MODEL_ACTION', payload: envelope({ findings: [unsafe] }) },
+    { code: 'MODEL_INCOMPLETE', payload: { status: 'incomplete', output: [] } },
+    { code: 'MODEL_HTTP', status: 401 },
+    { code: 'MODEL_HTTP', status: 429 },
+  ];
+  for (const scenario of cases) {
+    let calls = 0;
+    await rejectsCode(analyze(null, { fetchImpl: async () => {
+      calls += 1;
+      return { ok: !scenario.status, status: scenario.status || 200, json: async () => scenario.payload };
+    } }), scenario.code);
+    assert.equal(calls, 1, scenario.code);
+  }
+  let calls = 0;
+  await rejectsCode(analyze(null, { config: {}, fetchImpl: async () => { calls += 1; } }), 'MODEL_UNCONFIGURED');
+  assert.equal(calls, 0);
+});
+
+test('retry delay injection is bounded before any request', async () => {
+  for (const retryDelayMs of [-1, 5_001, 0.5]) {
+    let calls = 0;
+    await rejectsCode(analyze(null, { retryDelayMs, fetchImpl: async () => { calls += 1; } }), 'MODEL_CONFIG');
+    assert.equal(calls, 0);
+  }
 });

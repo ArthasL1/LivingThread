@@ -42,9 +42,13 @@ All observation fields, including titles, text, URLs, account labels, and contex
 
 Find independently worded statements about the SAME concrete event/entity and the SAME attribute, date, timezone, audience, and scope. Begin with the identity and context, not matching keywords alone. Focus on meaningful date, time, location, and arrangement inconsistencies. Detect pre-existing inconsistencies even when no copy or update event exists. Do not require resource enrollment, identical wording, or a clipboard event. Distinct events with the same name are not linked without supporting context.
 
+A conflict requires explicit, mutually incompatible claims about the same attribute: the claims cannot both be true for the same event and scope. Compatible differences in specificity are NOT conflicts. For example, 'Level 7, Room 742' and 'the seventh floor' agree on the floor; the second source does not assert a different room. An omitted room, end time, year, participant, or other detail is unknown in that source, not a contradictory claim. This is especially important for partial or visible-only observations. Never label a compatible shorter description as outdated merely because another source provides more detail. Do not produce consistency findings or replacement actions whose only purpose is enrichment, completeness, or copying a more specific description. Infer a floor only from an explicit floor statement, never from a room number. If all asserted facts are compatible and there is no genuine unresolved proposal, return findings: []. A different explicitly stated floor or room can still be a real conflict when event identity and scope match.
+
 Avoid false conflicts: paraphrases; 3 PM versus 15:00 in the same timezone; staff setup versus customer arrival; historical versus explicitly current arrangements; and differences intentionally maintained for distinct audiences. Use clarifications to revise the interpretation, not merely hide a warning. Return findings: [] when no meaningful inconsistency or relevant unresolved proposal exists.
 
 No application is always authoritative. Observation timestamps describe when we saw content, NOT when it became true. Never choose truth by timestamp recency or majority. An explicit confirmed change or an applicable user clarification may establish the intended current arrangement. If authority remains unclear, explain it and offer no speculative replacement. A question or suggested change is pending, not confirmed. Silence or one participant's assent does not imply agreement from everyone affected.
+
+Resolve the arrangement's history before deciding whether a conflict remains. An explicit confirmed rescheduling, relocation, or correction for the same event and scope can supersede an earlier confirmed conversation statement. The earlier message is then historical context, not a competing claim about the present arrangement, even though its original wording remains visible and says 'confirmed'. Establish this from the meaning and applicable scope of the change, not observation recency alone. If the current document and draft statements all agree with the explicitly confirmed change, return findings: []; do not keep a conflict alive solely because superseded conversation history is still present. Preserve that history without rewriting it or announcing the same update again. Conversely, a current operational document or unsent draft that still asserts the old arrangement remains a conflict until corrected; do not assume it was updated. A tentative change, unresolved authority, or genuinely incompatible current statement still warrants a finding even if no safe action is available.
 
 Every finding needs at least two exact, nonempty quotes from distinct observed source IDs. Copy quotes verbatim from observation.text, including punctuation and whitespace. Mark evidence current, outdated, proposal, or context. Say when a source is stale, visible-only, or partial; do not claim coverage beyond what was observed. You may flag a stale snapshot as unchecked, but must never propose editing a stale source. Group the same event/attribute issue across apps into one concise finding, rather than duplicate notices.
 
@@ -204,8 +208,8 @@ function requestConfiguration(config) {
   return { url, effort };
 }
 
-/** One bounded, read-only model analysis. Actions are proposals and never execute here. */
-export async function analyzeObservations(observations, {
+/** A single provider attempt. Actions are proposals and never execute here. */
+async function analyzeOnce(observations, {
   config, clarifications = [], signal, fetchImpl = globalThis.fetch, timeoutMs = 45_000,
 } = {}) {
   const started = performance.now();
@@ -216,7 +220,7 @@ export async function analyzeObservations(observations, {
   }
   if (signal?.aborted) fail('MODEL_CANCELLED', 'Analysis was cancelled.');
   if (sources.length < 2) {
-    return { findings: [], latencyMs: Math.round(performance.now() - started), model: config.deployment };
+    return { findings: [], latencyMs: Math.round(performance.now() - started), model: config.deployment, attempts: 0 };
   }
   const timeout = AbortSignal.timeout(timeoutMs);
   const requestSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
@@ -277,4 +281,42 @@ export async function analyzeObservations(observations, {
     latencyMs: Math.round(performance.now() - started),
     model: typeof payload.model === 'string' ? payload.model : config.deployment,
   };
+}
+
+function waitBeforeRetry(delayMs, signal) {
+  if (signal?.aborted) return Promise.reject(new AgentError('MODEL_CANCELLED', 'Analysis was cancelled.'));
+  return new Promise((resolve, reject) => {
+    const onAbort = () => {
+      clearTimeout(timer);
+      signal?.removeEventListener('abort', onAbort);
+      reject(new AgentError('MODEL_CANCELLED', 'Analysis was cancelled.'));
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, delayMs);
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+/** At most two read-only provider attempts; no application actions execute or retry here. */
+export async function analyzeObservations(observations, options = {}) {
+  const started = performance.now();
+  const { retryDelayMs = 2_000, signal } = options;
+  if (!Number.isInteger(retryDelayMs) || retryDelayMs < 0 || retryDelayMs > 5_000) {
+    fail('MODEL_CONFIG', 'The analysis retry delay must be between 0 and 5000 milliseconds.');
+  }
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    if (signal?.aborted) fail('MODEL_CANCELLED', 'Analysis was cancelled.');
+    try {
+      const result = await analyzeOnce(observations, options);
+      return { ...result, attempts: result.attempts === 0 ? 0 : attempt,
+        latencyMs: Math.round(performance.now() - started) };
+    } catch (error) {
+      if (signal?.aborted) fail('MODEL_CANCELLED', 'Analysis was cancelled.');
+      if (attempt === 2 || !(error instanceof AgentError)
+        || !['MODEL_TIMEOUT', 'MODEL_TRANSPORT'].includes(error.code)) throw error;
+      await waitBeforeRetry(retryDelayMs, signal);
+    }
+  }
 }

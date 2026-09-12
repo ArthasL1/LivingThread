@@ -8,6 +8,7 @@ import { WorkState } from './state.mjs';
 import { createOperationJournal } from './journal.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const { version } = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
 const config = await loadConfig(root);
 const state = new WorkState();
 const runtime = resolve(root, process.env.LIVINGTHREAD_RUNTIME || '.runtime');
@@ -23,6 +24,7 @@ const pairingPath = resolve(runtime, 'pairing.json');
 let pairing = JSON.parse(await readFile(pairingPath, 'utf8').catch(() => 'null'));
 let timer;
 let analyzing = false;
+let analysisController;
 let analysisDirty = false;
 let slack;
 
@@ -46,16 +48,17 @@ async function analyze() {
   const observations = [...state.observations.values()].filter(o => o.text.trim());
   if (observations.length < 2) return;
   analyzing = true; analysisDirty = false; state.checking = true; state.error = journalError;
+  analysisController = new AbortController();
   const revision = state.revision;
   try {
     const { analyzeObservations } = await import('./agent.mjs');
-    const result = await analyzeObservations(observations, { config: config.model, clarifications: state.clarifications });
+    const result = await analyzeObservations(observations, { config: config.model, clarifications: state.clarifications, signal: analysisController.signal });
     if (revision === state.revision && state.session.enabled) {
       state.acceptFindings(result.findings);
-      state.diagnostics.push({ app: 'agent', message: `Checked ${observations.length} sources in ${result.latencyMs} ms.`, at: new Date().toISOString() });
+      state.diagnostics.push({ app: 'agent', message: `Checked ${observations.length} sources in ${result.latencyMs} ms.${result.attempts > 1 ? ' Recovered after one read-only retry.' : ''}`, at: new Date().toISOString() });
     } else analysisDirty = true;
-  } catch (error) { state.error = error.code === 'ERR_MODULE_NOT_FOUND' ? 'The agent module is being installed.' : String(error.message).slice(0, 400); }
-  finally { analyzing = false; state.checking = false; if (analysisDirty && state.session.enabled) { timer = setTimeout(analyze, 1500); } }
+  } catch (error) { if (error.code !== 'MODEL_CANCELLED') state.error = error.code === 'ERR_MODULE_NOT_FOUND' ? 'The agent module is being installed.' : String(error.message).slice(0, 400); }
+  finally { analysisController = null; analyzing = false; state.checking = false; if (analysisDirty && state.session.enabled) { timer = setTimeout(analyze, 1500); } }
 }
 async function initializeSlack() {
   try {
@@ -94,7 +97,7 @@ const server = http.createServer(async (request, response) => {
   try {
     if (!['127.0.0.1:' + config.port, 'localhost:' + config.port].includes(request.headers.host)) return send(response, 403, { error: 'Invalid local service host.' });
     const path = new URL(request.url, `http://127.0.0.1:${config.port}`).pathname;
-    if (path === '/health' || path === '/') return send(response, 200, { name: 'LivingThread', status: 'ready', version: '0.1.1', modelConfigured: !!config.model.apiKey, extensionPaired: !!pairing, sessionEnabled: state.session.enabled });
+    if (path === '/health' || path === '/') return send(response, 200, { name: 'LivingThread', status: 'ready', version, modelConfigured: !!config.model.apiKey, extensionPaired: !!pairing, sessionEnabled: state.session.enabled });
     if (path === '/api/pair' && request.method === 'POST') {
       if (!originAllowed) return send(response, 403, { error: 'Connect from the LivingThread extension. Another extension may already be paired.' });
       if (!pairing) { pairing = { origin: extensionOrigin, token: randomBytes(32).toString('hex') }; await writeFile(pairingPath, JSON.stringify(pairing), { mode: 0o600 }); }
@@ -110,7 +113,7 @@ const server = http.createServer(async (request, response) => {
     if (path === '/api/session') {
       state.session = { enabled: body.enabled === true, startedAt: body.enabled ? new Date().toISOString() : state.session.startedAt };
       if (state.session.enabled) { if (!slack) await initializeSlack(); await slack?.start(); scheduleAnalysis(); }
-      else { await slack?.stop(); clearTimeout(timer); }
+      else { analysisController?.abort(); await slack?.stop(); clearTimeout(timer); }
       return send(response, 200, state.snapshot());
     }
     if (path === '/api/observations') { const changed = state.observe(body); if (changed) scheduleAnalysis(); return send(response, 200, { ok: true, changed }); }
@@ -156,4 +159,4 @@ const server = http.createServer(async (request, response) => {
 });
 server.listen(config.port, '127.0.0.1', () => console.log(`LivingThread ready at http://127.0.0.1:${config.port}. Model configured: ${!!config.model.apiKey}. Load the extension and start a work session.`));
 server.on('error', error => { console.error(error.code === 'EADDRINUSE' ? 'LivingThread port is already in use.' : 'LivingThread could not start.'); process.exitCode = 1; });
-process.on('SIGINT', async () => { clearTimeout(timer); await slack?.stop(); server.close(); process.exit(0); });
+process.on('SIGINT', async () => { clearTimeout(timer); analysisController?.abort(); await slack?.stop(); server.close(); process.exit(0); });

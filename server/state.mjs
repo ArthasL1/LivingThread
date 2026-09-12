@@ -65,13 +65,26 @@ export class WorkState {
   }
   close(tabId, activeIds) {
     let changed = false;
+    const removed = new Set();
     for (const [id, observation] of this.observations) {
-      if (observation.tabId !== tabId || activeIds?.includes(id) || observation.stale) continue;
+      if (observation.tabId !== tabId || activeIds?.includes(id)) continue;
+      // Composer IDs belong to one page lifetime; retaining closed drafts invents duplicate sources after reload.
+      if (observation.app === 'gmail') {
+        this.observations.delete(id);
+        removed.add(id);
+        changed = true;
+        continue;
+      }
+      if (observation.stale) continue;
       this.observations.set(id, { ...observation, stale: true, editable: false });
       changed = true;
     }
+    if (removed.size) this.findings = this.findings.filter(finding => !finding.evidence.some(e => removed.has(e.sourceId)));
     for (const finding of this.findings) {
-      finding.actions = finding.actions.filter(a => !this.observations.get(a.sourceId)?.stale);
+      finding.actions = finding.actions.filter(a => {
+        const source = this.observations.get(a.sourceId);
+        return source && !source.stale;
+      });
     }
     if (changed) this.revision++;
     return changed;
@@ -137,7 +150,7 @@ export class WorkState {
     for (const command of commands) {
       const operation = this.operations.find(o => o.id === command.operationId);
       const source = this.observations.get(command.action.sourceId);
-      if (source?.stale || source?.version !== command.action.expectedVersion) {
+      if (!source || source.stale || source.version !== command.action.expectedVersion) {
         operation.status = 'failed'; operation.message = 'The target changed before execution; no edit was attempted.';
         this.#replacementChecks.delete(operation.id);
       } else { operation.status = 'running'; operation.startedAt = Date.now(); accepted.push(command); }
@@ -164,7 +177,8 @@ export class WorkState {
     }
     operation.finishedAt = new Date().toISOString();
     this.#replacementChecks.delete(operationId);
-    if (observation) {
+    // A late result may complete an operation, but cannot reopen a composer removed by presence tracking.
+    if (observation && (observation.app !== 'gmail' || source)) {
       this.observe({ ...observation, tabId: source?.tabId ?? check?.tabId });
     }
     return operation;

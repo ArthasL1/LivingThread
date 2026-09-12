@@ -8,7 +8,7 @@
   const send = async (message) => {
     try {
       const result = await chrome.runtime.sendMessage(message);
-      if (result?.error) throw new Error(result.error);
+      if (result?.error && !result.session) throw new Error(result.error);
       return result;
     } catch (error) {
       throw new Error(error.message.includes('context invalidated') ? 'Refresh this page after reloading LivingThread.' : error.message);

@@ -155,3 +155,62 @@ test('Slack success remains valid without a replacement observation', () => {
   operation.status = 'running';
   assert.equal(state.result(operation.id, { ok: true, message: 'Slack accepted the message.' }).status, 'succeeded');
 });
+
+test('closing a Gmail tab removes its composers and findings but retains the operation journal', () => {
+  const state = setup();
+  const finding = state.findings[0];
+  const mailAction = finding.actions.find(action => action.sourceId === 'mail');
+  const [{ operation }] = state.approve(finding.id, [mailAction.id]);
+  const revision = state.revision;
+  assert.equal(state.close(13), true);
+  assert.equal(state.observations.has('mail'), false);
+  assert.equal(state.findings.length, 0);
+  assert.equal(state.observations.get('doc').stale, false);
+  assert.equal(state.operations[0], operation);
+  assert.equal(state.revision, revision + 1);
+  assert.deepEqual(state.takeCommands(), []);
+  assert.equal(operation.status, 'failed');
+  assert.match(operation.message, /no edit was attempted/);
+  assert.equal(state.close(13), false);
+});
+
+test('Gmail presence removes only absent composers on that tab, including old stale copies', () => {
+  const state = setup();
+  const oldMail = state.observations.get('mail');
+  state.observations.set('mail', { ...oldMail, stale: true, editable: false });
+  state.observe({ ...oldMail, id: 'mail-reloaded', resourceId: 'mail-reloaded' });
+  state.observe({ ...oldMail, id: 'mail-other-tab', resourceId: 'mail-other-tab', tabId: 14 });
+  assert.equal(state.close(13, ['mail-reloaded']), true);
+  assert.equal(state.observations.has('mail'), false);
+  assert.equal(state.observations.get('mail-reloaded').stale, false);
+  assert.equal(state.observations.get('mail-other-tab').stale, false);
+  assert.equal(state.close(13, ['mail-reloaded']), false);
+  assert.equal(state.close(13, []), true);
+  assert.equal(state.observations.has('mail-reloaded'), false);
+});
+
+test('Docs presence still retains a stale snapshot and withholds its actions', () => {
+  const state = setup();
+  const oldText = state.observations.get('doc').text;
+  assert.equal(state.close(12, []), true);
+  assert.equal(state.observations.get('doc').text, oldText);
+  assert.equal(state.observations.get('doc').stale, true);
+  assert.equal(state.observations.get('doc').editable, false);
+  assert.equal(state.findings.length, 1);
+  assert.deepEqual(state.findings[0].actions.map(action => action.sourceId), ['mail']);
+  assert.equal(state.close(12, []), false);
+});
+
+test('a late verified Gmail result completes its journal entry without resurrecting a closed composer', () => {
+  const state = setup();
+  const finding = state.findings[0];
+  const mailAction = finding.actions.find(action => action.sourceId === 'mail');
+  const returnedObservation = { ...state.observations.get('mail'), text: 'Atlas is on the fifth floor.' };
+  const [{ operation }] = state.approve(finding.id, [mailAction.id]);
+  state.takeCommands();
+  state.close(13, []);
+  assert.equal(operation.status, 'running');
+  assert.equal(state.result(operation.id, { ok: true, message: 'Save verified before close.', observation: returnedObservation }).status, 'succeeded');
+  assert.equal(state.observations.has('mail'), false);
+  assert.equal(state.operations[0].message, 'Save verified before close.');
+});

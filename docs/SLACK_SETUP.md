@@ -1,6 +1,6 @@
 # Slack setup
 
-LivingThread uses its own Slack app, bot token, and Socket Mode connection. It does not use the development assistant's Slack connection. App installation and real-workspace checks are still required; the module's automated tests use synthetic data only.
+LivingThread uses its own Slack app, bot token, and Socket Mode connection. It does not use the development assistant's Slack connection. In the September 12 live checkpoint, the app is installed, its Socket Mode connection is active in a dedicated allowed channel, and two explicitly owner-approved synthetic messages have been received through the product adapter. Those messages were created by the development assistant as the signed-in user; they do not establish successful posting through LivingThread's reviewed bot-message action. That action remains to be validated. New installations still need the setup below.
 
 ## Create and install the app
 
@@ -9,7 +9,7 @@ LivingThread uses its own Slack app, bot token, and Socket Mode connection. It d
 3. Install the app to that workspace and copy the **Bot User OAuth Token** (`xoxb-…`) from **OAuth & Permissions** into the local, ignored `.env` as `SLACK_BOT_TOKEN`.
 4. Under **Basic Information → App-Level Tokens**, generate a token with the [`connections:write` scope](https://docs.slack.dev/reference/scopes/connections.write/). Save the resulting `xapp-…` value as `SLACK_APP_TOKEN`.
 5. Confirm **Socket Mode** and the `message.channels` bot event are enabled. No public callback URL or tunnel is required. See Slack's [Socket Mode setup](https://docs.slack.dev/apis/events-api/using-socket-mode/) and [connection method](https://docs.slack.dev/reference/methods/apps.connections.open/).
-6. Add the LivingThread app to the intended channel through the channel's **Integrations → Add apps** UI. If workspace administration restricts apps, its owner must approve installation. Merely installing an app does not grant membership in every channel.
+6. Add the LivingThread app to the intended channel through **Agents & apps → Add Agent or App**, as shown in the current Slack UI. If workspace administration restricts apps, its owner must approve installation. Merely installing an app does not grant membership in every channel.
 7. Copy the channel ID from the channel details or its browser URL. Put only intended channel IDs in `SLACK_CHANNEL_IDS`, separated by commas.
 8. Restart the local LivingThread service, then enable the work session. Confirm the Slack status reports connected and history retrieval succeeded for the intended channel. The app posts as **LivingThread**, not as the account owner.
 
@@ -80,11 +80,13 @@ Each operation needs a stable `clientMsgId`. In-process duplicate calls reuse it
 
 The adapter ledger is in memory. The main service must persist operation outcomes and preserve uncertain states across process restarts; recreating an adapter must not cause approved sends to be replayed. Source-event deduplication is also bounded and is not a durable event log.
 
-## Verification without sending
+## Verification and remaining checks
 
 Run `node --test tests/slack.test.mjs`. Tests inject a fake fetch implementation and WebSocket, and never contact Slack.
 
-After real installation, the owner can post and edit a short synthetic message in the allowed demo channel. Check that LivingThread receives its text and then its changed text under the same source identity. Delete the synthetic message and verify the old evidence disappears. Real reviewed posting should be tested separately only after approval of a specific message and destination.
+The current real connection received the synthetic baseline and a facilities-confirmed venue change. Together with the actual Docs/Gmail observations, the baseline produced zero findings; the change produced one conflict and two editor replacements, with no unnecessary Slack message. See [live acceptance](LIVE_ACCEPTANCE.md). No private channel IDs, account identifiers, or message links are included in these shared instructions.
+
+Real edit/deletion handling and product bot posting still need their own acceptance checks. The owner can edit a short synthetic message in the allowed demo channel and check that LivingThread replaces its observation under the same identity; a deletion should invalidate the old evidence. Test real reviewed posting separately only after approval of a specific message and destination. Successful fixture-message delivery does not prove those other behaviors.
 
 | Status | Next check |
 | --- | --- |
@@ -96,4 +98,4 @@ After real installation, the owner can post and edit a short synthetic message i
 | `reconnecting` | Network or Slack refresh; cached evidence is not live |
 | Post `uncertain` | Inspect Slack; do not blindly retry or replace the operation ID |
 
-Implementation was created during the official hackathon period. Official documentation above was checked on September 12, 2026. Real Slack installation, credentials, and end-to-end posting are not established by synthetic tests.
+Implementation was created during the official hackathon period. Official documentation above was checked on September 12, 2026. Real installation, connection, and message receipt are now supported by live evidence; synthetic tests are kept separate, and reviewed bot posting remains pending.

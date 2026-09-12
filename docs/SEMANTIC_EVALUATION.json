@@ -118,6 +118,173 @@
         }
       ],
       "completedAt": "2026-09-12T03:05:56.210Z"
+    },
+    {
+      "startedAt": "2026-09-12T04:01:42.001Z",
+      "model": "gpt-5.6-sol",
+      "reasoningEffort": "low",
+      "requestCount": 4,
+      "passed": 4,
+      "cases": [
+        {
+          "id": "confirmed-venue-change",
+          "attempt": 1,
+          "expected": "One conflict with reviewed Gmail and Docs replacements to the fifth floor; no redundant Slack message.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 1,
+          "replacementCount": 2,
+          "slackMessageCount": 0,
+          "latencyMs": 7727,
+          "summaries": [
+            {
+              "kind": "conflict",
+              "summary": "The confirmed venue is Level 5, Room 502, but the demo brief and customer email draft still direct attendees to the third floor.",
+              "actionCount": 2
+            }
+          ],
+          "usage": {
+            "input_tokens": 1735,
+            "output_tokens": 581,
+            "total_tokens": 2316
+          }
+        },
+        {
+          "id": "compatible-specificity",
+          "attempt": 1,
+          "expected": "No finding or action: Level 3, Room 301 and third floor are compatible; omitted room and year details are not disagreements.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 0,
+          "replacementCount": 0,
+          "slackMessageCount": 0,
+          "latencyMs": 1351,
+          "summaries": [],
+          "usage": {
+            "input_tokens": 1585,
+            "output_tokens": 14,
+            "total_tokens": 1599
+          }
+        },
+        {
+          "id": "confirmed-venue-change",
+          "attempt": 2,
+          "expected": "One conflict with reviewed Gmail and Docs replacements to the fifth floor; no redundant Slack message.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 1,
+          "replacementCount": 2,
+          "slackMessageCount": 0,
+          "latencyMs": 6990,
+          "summaries": [
+            {
+              "kind": "conflict",
+              "summary": "The confirmed venue change places the demo on Level 5, but the editable Docs brief and Gmail draft still direct people to the third floor.",
+              "actionCount": 2
+            }
+          ],
+          "usage": {
+            "input_tokens": 1735,
+            "output_tokens": 560,
+            "total_tokens": 2295
+          }
+        },
+        {
+          "id": "compatible-specificity",
+          "attempt": 2,
+          "expected": "No finding or action: Level 3, Room 301 and third floor are compatible; omitted room and year details are not disagreements.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 0,
+          "replacementCount": 0,
+          "slackMessageCount": 0,
+          "latencyMs": 1279,
+          "summaries": [],
+          "usage": {
+            "input_tokens": 1585,
+            "output_tokens": 14,
+            "total_tokens": 1599
+          }
+        }
+      ],
+      "completedAt": "2026-09-12T04:01:59.354Z"
+    },
+    {
+      "startedAt": "2026-09-12T04:16:57.009Z",
+      "model": "gpt-5.6-sol",
+      "reasoningEffort": "low",
+      "requestCount": 2,
+      "passed": 2,
+      "cases": [
+        {
+          "id": "resolved-change-with-history",
+          "attempt": 1,
+          "expected": "No finding or action: the current Docs and Gmail adopt Level 5, Room 502; the explicitly superseded Level 3 Slack message is history.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 0,
+          "replacementCount": 0,
+          "slackMessageCount": 0,
+          "latencyMs": 2308,
+          "summaries": [],
+          "usage": {
+            "input_tokens": 1930,
+            "output_tokens": 14,
+            "total_tokens": 1944
+          }
+        },
+        {
+          "id": "resolved-change-with-history",
+          "attempt": 2,
+          "expected": "No finding or action: the current Docs and Gmail adopt Level 5, Room 502; the explicitly superseded Level 3 Slack message is history.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 0,
+          "replacementCount": 0,
+          "slackMessageCount": 0,
+          "latencyMs": 1227,
+          "summaries": [],
+          "usage": {
+            "input_tokens": 1930,
+            "output_tokens": 14,
+            "total_tokens": 1944
+          }
+        }
+      ],
+      "completedAt": "2026-09-12T04:17:00.549Z"
+    },
+    {
+      "startedAt": "2026-09-12T04:17:14.118Z",
+      "model": "gpt-5.6-sol",
+      "reasoningEffort": "low",
+      "requestCount": 1,
+      "passed": 1,
+      "cases": [
+        {
+          "id": "confirmed-venue-change",
+          "attempt": 1,
+          "expected": "One conflict with reviewed Gmail and Docs replacements to the fifth floor; no redundant Slack message.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 1,
+          "replacementCount": 2,
+          "slackMessageCount": 0,
+          "latencyMs": 6351,
+          "summaries": [
+            {
+              "kind": "conflict",
+              "summary": "The confirmed venue is Level 5, Room 502, but the current demo brief and customer email draft still direct attendees to the third floor.",
+              "actionCount": 2
+            }
+          ],
+          "usage": {
+            "input_tokens": 1920,
+            "output_tokens": 512,
+            "total_tokens": 2432
+          }
+        }
+      ],
+      "completedAt": "2026-09-12T04:17:20.473Z"
     }
   ]
 }

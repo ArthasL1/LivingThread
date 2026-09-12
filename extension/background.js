@@ -49,12 +49,13 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
     if (message.type === 'observe') {
       if (!sender.tab) throw new Error('Observation must originate from an app tab.');
       const result = await api('/api/observations', { ...message.observation, tabId: sender.tab.id });
-      pump();
+      if (result.changed) pump();
       return result;
     }
     if (message.type === 'diagnostic') return api('/api/diagnostics', { ...message.data, tabId: sender.tab?.id });
     if (message.type === 'presence' && sender.tab) return api('/api/closed', { tabId: sender.tab.id, activeIds: message.activeIds });
     if (message.type === 'capabilities') return { docsEditor: await chrome.permissions.contains({ permissions: ['debugger'] }) };
+    if (message.type === 'docs-export') return docsExport(sender, message);
     if (message.type === 'approve') { const result = await api('/api/approve', message); pump(); return result; }
     if (message.type === 'clarify') return api('/api/clarify', message);
     if (message.type === 'dismiss') return api('/api/dismiss', message);
@@ -63,6 +64,25 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
   })().then(respond, error => respond({ error: error.message }));
   return true;
 });
+async function docsExport(sender, message) {
+  const page = new URL(sender.tab?.url || sender.url || 'about:blank');
+  const match = page.pathname.match(/^\/document\/d\/([A-Za-z0-9_-]+)\/edit\/?$/);
+  // Bind the export to the real tab, including editors that message from a child frame.
+  if (!sender.tab || page.origin !== 'https://docs.google.com' || !match) throw new Error(`Document exports must originate from an open Google Doc (tab: ${!!sender.tab}, host: ${page.hostname}, supported path: ${!!match}).`);
+  if (!(await api('/api/state')).session.enabled) throw new Error('The work session is paused.');
+  const url = new URL(`https://docs.google.com/document/d/${match[1]}/export`);
+  url.searchParams.set('format', 'txt');
+  const documentTab = page.searchParams.get('tab');
+  if (documentTab) url.searchParams.set('tab', documentTab);
+  if (/^\d{1,2}$/.test(message.accountSlot || '')) url.searchParams.set('authuser', message.accountSlot);
+  let response;
+  try { response = await fetch(url.href, { credentials: 'include', cache: 'no-store', signal: AbortSignal.timeout(8000) }); }
+  catch { throw new Error('The document export request could not complete. Check Google Docs access and the extension host permissions.'); }
+  if (!response.ok || !/text\/plain|application\/octet-stream/.test(response.headers.get('content-type') || '')) throw new Error(`Google Docs did not return document text (HTTP ${response.status}).`);
+  const body = await response.text();
+  if (body.length > 100000) throw new Error('This document exceeds the prototype text limit.');
+  return { body };
+}
 // Docs-only experimental adapter bridge. It never navigates browser settings or other hosts.
 async function docsCommand(tabId, method, params) {
   const tab = await chrome.tabs.get(tabId);

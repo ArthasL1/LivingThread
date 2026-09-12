@@ -4,7 +4,9 @@
 
 An agent that connects related information across apps, flags conflicts where you work, and helps coordinate the right updates. Built for the Agents Everywhere hackathon.
 
-**Status: prototype implemented; live integration validation in progress.** At this development checkpoint, 64 automated tests and five synthetic semantic cases against the configured Azure model passed. Extension-to-service pairing is still being investigated. A complete real-browser/Slack workflow, saved Google Docs edits, and approved Slack posting have **not** yet been verified end to end. The test results do not establish those integrations.
+**Status: the real observation-to-resolution workflow is verified.** Edge has v0.1.4 loaded. The product observed the personal-account Google Doc and Gmail draft, received actual Slack events, and displayed its native Gmail notice. The compatible baseline produced zero findings; a confirmed venue change produced one conflict and two proposed edits. Both were approved through LivingThread, saved by its adapters, and freshly verified after reloading both apps. A final live check correctly returned no findings after the historical-message correction. The reviewed result group now remains available as findings change; the Docs page can reopen it after a reload. See [live acceptance](docs/LIVE_ACCEPTANCE.md) for exact evidence and limits.
+
+The GitHub repository is currently **private**; the hackathon's public-repository requirement is still pending.
 
 Core implementation began on **September 12, 2026 at 02:54 UTC / 10:54 HKT**, after the owner confirmed that the official hackathon period had started. See [build provenance](docs/BUILD_PROVENANCE.md) for the preparation/build separation.
 
@@ -29,7 +31,7 @@ Requirements: **Node.js 22 or newer**, a Chromium desktop browser, an Azure depl
 
 3. Check [the local health endpoint](http://127.0.0.1:4317/health). It should report `status: "ready"`. `modelConfigured` only confirms that a key is present; it is not an API connectivity test.
 4. Open your browser's extension manager, enable **Developer mode**, choose **Load unpacked**, and select this repository's `extension` directory. For Edge, the extension manager is `edge://extensions/`; for Chrome, it is `chrome://extensions/`.
-5. Open LivingThread from the browser toolbar and choose **Connect local service**, then **Start work session**. Pairing remains an active integration issue at this checkpoint; a connection failure is not a successful setup.
+5. Open LivingThread from the browser toolbar and choose **Connect local service**, then **Start work session**. The popup must report **Connected · work session active**. Loading the extension alone does not start observation.
 6. Refresh already-open Gmail and Google Docs tabs after loading or reloading the extension. Use a dedicated demo browser profile and short synthetic documents/drafts while live validation continues.
 7. Open **Connection & editor diagnostics** in the popup to inspect collected sources, coverage, and Slack state. **Pause work session** stops new observation and checks; keep the service running while using the prototype.
 
@@ -52,7 +54,7 @@ The service also recognizes the owner's existing `AZURE_OPENAI_MODEL_J_DEPLOYMEN
 
 Follow [Slack setup](docs/SLACK_SETUP.md) for the importable app manifest, exact permissions, and installation steps. Supply `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, and a comma-separated `SLACK_CHANNEL_IDS` allowlist in `.env`. Restart the service after configuration changes.
 
-The public-channel setup uses bot `channels:history` and `chat:write`, an app-level `connections:write` token, and `message.channels` events. Invite the app to each allowed channel. Slack is reported as **unconfigured** when credentials or channel IDs are missing. No public callback server or tunnel is required. Live installation and posting remain to be validated.
+The public-channel setup uses bot `channels:history` and `chat:write`, an app-level `connections:write` token, and `message.channels` events. Add the app to each allowed channel through **Agents & apps → Add Agent or App**. Slack is reported as **unconfigured** when credentials or channel IDs are missing. No public callback server or tunnel is required. Installation, a real Socket Mode connection, and receipt of the two approved synthetic fixture messages are verified; posting through LivingThread's reviewed bot action remains unverified.
 
 ## Architecture and access boundaries
 
@@ -60,12 +62,12 @@ The public-channel setup uses bot `channels:history` and `chat:write`, an app-le
 | --- | --- | --- |
 | Browser extension | Manifest V3 content adapters, work-session popup, Shadow DOM review UI | Same installed browser profile; no mobile or cross-profile observation |
 | Local service | Native Node HTTP service, paired extension access, session state, bounded Azure analysis | Must be running locally; no hosted service |
-| Gmail | Observe the subject/body of open composers; recheck identity and exact text before a local edit | No inbox crawl, closed-draft monitoring, attachments, or email sending; real saved-write verification is in progress |
-| Google Docs | Authenticated plain-text export plus editor integration through Docs' own find/replace UI; debugger bridge restricted to Docs | Experimental; document-tab coverage and saved edits remain unverified; observations are partial |
+| Gmail | Observe the subject/body of open composers; recheck identity and exact text before a local edit | Reviewed edit, save indication, and reload persistence verified for the fixture; no inbox crawl, closed-draft monitoring, attachments, or email sending |
+| Google Docs | Authenticated plain-text export in the extension worker, bound to the actual sending Doc; native find/replace editor integration with a Docs-restricted debugger bridge | Fixture read, reviewed save, and reload persistence verified; multi-tab coverage and broader editor reliability remain unverified; observations are partial |
 | Slack | Socket Mode events, recent allowed-channel history, edited/deleted messages, reviewed posts | At most 15 initial messages per channel; older thread replies and file contents are not backfilled |
 | Operation journal | Serialized, checksum-protected atomic persistence of operation status | Interrupted queued/running operations recover as uncertain and are never replayed automatically |
 
-The current Docs implementation uses the signed-in browser and does not require Google Cloud/OAuth setup. It has not yet established reliable saved editing. A Docs API route remains an alternative if the browser approach fails validation.
+The current Docs implementation uses the signed-in browser and does not require Google Cloud/OAuth setup. The live fixture passed authenticated reading, the exact reviewed edit, saved-result verification, and a fresh read after reload. This is one acceptance case rather than proof of general editor reliability. Successful exports are cached for 30 seconds while idle, with relevant saved-change/explicit refreshes and a 60-second backoff after a 429 response. These limits reduce repeated requests and do not imply continuous document freshness.
 
 The extension requests `debugger` permission for the experimental Docs editor bridge. The bridge restricts target pages and supported commands and detaches after each command. The browser may display its debugger permission/attachment notice; this is not hidden from the user.
 
@@ -76,6 +78,7 @@ The extension requests `debugger` permission for the experimental Docs editor br
 - Observations and findings live in service memory. `.runtime/` contains private pairing information, operation metadata/status, and local connection diagnostics. The extension stores its local pairing token in browser storage. `.env` and `.runtime/` are ignored by Git.
 - Pausing does not erase already observed information or undo an operation that has already started. Closing a page or losing Slack connectivity makes its cached evidence non-live. A later snapshot cannot establish changes in content the adapter did not observe.
 - Every proposed edit requires a unique exact target and version checks. The service records attempts before dispatch. A timeout or unverifiable result is **uncertain**, not success; inspect the actual target before taking further action. The journal is kept across restarts to prevent blind retries.
+- Read-only model analysis retries a timeout or transport failure at most once after two seconds. Pausing cancels the active analysis and pending retry. Validation/refusal/HTTP failures are not retried automatically. A model-check failure remains separate from an already verified editor save.
 - The model's analysis is bounded to 40 sources, 50,000 characters per source, and 160,000 characters total. Exceeding a bound reports an error rather than silently claiming all content was checked. Long-running sessions and broad workspaces are not yet supported.
 
 ## Verification
@@ -87,17 +90,17 @@ node --test tests/*.test.mjs
 node scripts/check.mjs
 ```
 
-The recorded checkpoint is **64 passing automated tests** across semantic validation, state/action preconditions, Gmail helper behavior, Slack transport, operation persistence, and local HTTP behavior. These tests use synthetic data and do not demonstrate saved edits in live apps.
+The latest full suite passed **90/90 automated tests** across semantic validation, state/action preconditions, Gmail helper behavior, Slack transport, operation persistence, extension boundaries, Docs read policy, and local HTTP behavior. Earlier full/focused checkpoint counts overlap and are not additive. Synthetic tests are separate from the real saved-write and reload checks recorded in [live acceptance](docs/LIVE_ACCEPTANCE.md).
 
-To make five real Azure calls using only the synthetic cases:
+To run the current synthetic cases against the real configured Azure deployment:
 
 ```sh
 node scripts/evaluate.mjs
 ```
 
-This uses your Azure budget and writes a report to [SEMANTIC_EVALUATION.json](docs/SEMANTIC_EVALUATION.json). The September 12 run passed **5/5** cases: confirmed venue change, pre-existing conflict, legitimate time differences, tentative proposal, and unrelated events. It validates those semantic expectations only; it does not measure general reliability or the complete observation-to-notice delay.
+This uses your Azure budget and writes a report to [SEMANTIC_EVALUATION.json](docs/SEMANTIC_EVALUATION.json). The initial September 12 run passed five cases: confirmed venue change, pre-existing conflict, legitimate time differences, tentative proposal, and unrelated events. Live checks exposed false positives from compatible differences in specificity and explicitly superseded Slack history. General prompt corrections were checked with seven follow-up calls, including compatible baselines, confirmed changes, and resolved changes with history. All passed: **twelve real Azure evaluation calls across seven unique cases**. This count excludes normal live analysis calls and does not measure general reliability or complete observation-to-notice delay.
 
-Live acceptance still needs the real extension/service pairing, observation from the intended personal Google account, preserved saved editor changes, actual Slack access, and the complete cross-app demo. Development-assistant browser control is not a runtime dependency and is not counted as product integration proof.
+Actual personal-account Docs/Gmail observations, Slack event receipt, automatic association, the native Gmail notice, two approved saved edits, persistence after reloading both apps, and final resolution have passed for the dedicated fixture. The original time, presenter, and remaining text were preserved. After a service restart and fresh observation of all four sources, the live resolved-state analysis completed in 2,495 ms with no findings; that is model-check time, not complete workflow latency. Review-result continuity is verified in the actual UI. Gmail receipt recovery after a full page reload and the reviewed Slack bot-post action remain unverified or unsupported; see the live record. A transient model timeout was shown separately from successful saved edits. The development assistant created two approved Slack fixture messages as the user and clicked the product's approval control. LivingThread itself observed the messages, applied the edits, and verified the saved content.
 
 ## Project documents
 
