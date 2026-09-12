@@ -1,95 +1,68 @@
 # LivingThread — Two-minute demo
 
-**Recording plan; final video pending.** The actual venue-change workflow passed live acceptance on September 12: Slack event delivery, Docs/Gmail observation, automatic Gmail notice, two approved saved edits, and persistence after both application reloads. The semantic interpretation of retained historical messages and the continuity of operation results received follow-up fixes. See [live acceptance](LIVE_ACCEPTANCE.md) for the current evidence and limitations.
+**Recording plan; final video pending.** The original venue-change workflow passed real Slack/Docs/Gmail acceptance, and the separate reviewed Slack question also passed. These earlier checks do not mean the next rehearsal or recording has already succeeded. See [live acceptance](LIVE_ACCEPTANCE.md).
 
-The scenario is fictional and runs in real Slack, Google Docs, and Gmail. The product must obtain observations through its own adapters and produce findings through the configured Azure model. Do not inject a prepared finding, hardcode “Atlas,” run the test-fixture evaluator as the application, or use the development assistant's browser tools as a hidden product runtime.
+The central story is visible: **LivingThread shows up inside existing work without waiting for a comparison prompt.** It notices related information drifting before the user has assembled a task for an assistant.
 
-## Rehearsal setup
+## Before pressing Record
 
-- Use the intended personal Google account in the paired browser profile, a short editable Google Doc, one recipientless Gmail draft, and an allowed demo Slack channel.
-- Run the local service, connect the extension, and choose **Start work session**. Keep the Doc and Gmail composer open. No resource enrollment is required.
-- Establish actual observations of the baseline below and wait for the current check to finish. Verify that the source list contains the intended Doc, draft, and Slack messages. The session's observation scope must be visible to the demonstrator.
-- Confirm both target adapters can save the exact approved edit and verify the result. Test reopening the Doc and saved draft before filming. A page overlay or a successful helper test does not satisfy this check.
-- Reset with explicit, current baseline wording in the test channel and both editors. Use a fresh, clearly identified test event if old messages would make the reset ambiguous. Start a fresh rehearsal only after the source state is verified; preserve operation history and uncertain outcomes.
-- Finish the recording under two minutes. The timestamps below are a target edit, not measured product latency. If waiting is shortened in the final video, label the cut; do not imply a faster reaction than actually observed.
+Follow the detailed [operator guide](OPERATOR_GUIDE.md). Use [Take 01: Harbor](demo/take-01-rehearsal.md) for the first untimed rehearsal, [Take 02: Cedar](demo/take-02-recording.md) for recording, and [Take 03: Maple](demo/take-03-retake.md) for a fresh retake. Each pack contains all application text.
 
-## Baseline content
+- Complete account checks, local-service connection, work-session activation, and baseline reading before recording.
+- Keep the correct Slack channel, one current Doc, and one recipientless Gmail composer open in the installed Edge profile. The baseline should have no finding for this event and no read/model error.
+- Post the baseline Slack message during setup. Keep the confirmed venue-change message ready to paste, but do not send it until the recorded trigger.
+- Keep Docs and Gmail on the third-floor baseline. Close the separate proposed-time draft.
+- Maximize the browser, expand the Gmail composer, and rehearse where the notice and results appear.
+- All business details are fictional inside real applications. The product must obtain real observations and call its configured model; do not inject findings or use the development assistant as the product runtime.
 
-**Event:** Atlas customer demo, 18 September 2026, 15:00–15:30 HKT. Initial location: Level 3, Room 301. Updated location: Level 5, Room 502. All names and arrangements are synthetic.
+## Screen sequence and complete English narration
 
-Slack baseline:
+Times are editing targets, not measured product latency. Replace Cedar with the current take's event name when necessary.
 
-> Confirmed: the Atlas customer demo is on 18 September 2026, 15:00–15:30 HKT, at Level 3, Room 301. Jamie will lead the product walkthrough.
-
-Google Doc title: **Atlas demo brief**
-
-> The Atlas customer demo is scheduled for 18 September 2026, from 15:00 to 15:30 HKT. The demo will take place on the third floor. Jamie will lead the product walkthrough.
-
-Gmail subject: **Atlas demo: arrival details for 18 September**
-
-```text
-Hi Morgan,
-
-We look forward to the Atlas customer demo on 18 September 2026, from 15:00 to 15:30 HKT. When you arrive, head to the third floor. Jamie will meet you there.
-
-Best,
-Jamie
-```
-
-New Slack message for the presenter to post during the demonstration:
-
-> Confirmed with facilities: the Atlas customer demo on 18 September 2026 has moved to Level 5, Room 502. The time remains 15:00–15:30 HKT.
-
-This script is not authorization for the development assistant to send that message. The presenter controls the synthetic change in the intended demo channel.
-
-## Two-minute sequence
-
-| Time | Screen and action | English narration |
+| Target time | Operator action | English narration |
 | --- | --- | --- |
-| 0:00–0:12 | Show the baseline Slack message and briefly show the enabled work-session popup. | “Plans live in conversations, documents, and emails. When a detail changes, those versions drift. LivingThread connects the information while you work.” |
-| 0:12–0:28 | Switch to the Doc, then the Gmail draft. Point at “third floor” in each. | “Here is one customer demo, described differently in three apps. I have enabled a work session. I have not tagged these items, copied them into a chatbot, or asked for a comparison.” |
-| 0:28–0:41 | In Slack, the presenter posts the confirmed Level 5 update above. Return to the Gmail composer. | “The team confirms a new venue. The customer email still points to the old floor.” |
-| 0:41–0:56 | Keep the Gmail composer visible while the product observes and checks. Capture the notice **A detail may be out of date** appearing. | “LivingThread shows up beside the affected draft. It recognizes the shared event even though the wording differs.” |
-| 0:56–1:14 | Click **Review the connection →**. Show **What connects these details**, the exact source quotes, source links, and coverage/observation labels. | “The notice shows its evidence: the confirmed Slack change and the outdated wording. I can inspect what it observed before deciding what to change.” |
-| 1:14–1:29 | Under **Review the next steps**, inspect **Update Gmail** and **Update Google Docs**. Show **Current wording** and **After your approval**. Leave the two intended edits selected and click **Apply 2 changes** once. | “It proposes two precise edits. The floor changes; the event time and everything else stay intact. I approve both changes here.” |
-| 1:29–1:51 | Keep **Operation results** visible. After actual success, show the Gmail wording and switch to the Doc to show its saved fifth-floor wording. Use the rehearsed reload/reopen check if it fits; otherwise include a clearly labeled cut from the same verified run. | “Each action reports its own result. The draft and the saved brief now agree. The email remains a draft, and there is no redundant Slack announcement.” |
-| 1:51–2:00 | End on the real corrected draft or Doc with the LivingThread review/result panel. | “LivingThread: different apps, one living thread. It catches the inconsistency where the work is happening—and keeps the decision with you.” |
+| 0:00–0:12 | Start on the customer draft with third-floor wording visible. | “An important detail changes in Slack. But your document and the email you are writing still contain the old plan. You may not notice before you send it.” |
+| 0:12–0:26 | Briefly show the Doc and Slack baseline for the same event. | “This is Cedar's customer demo, described differently in three apps. LivingThread is already observing my work session. I haven't linked these items or asked it to compare them.” |
+| 0:26–0:42 | Send the pack's confirmed Slack venue change as a channel message. Return directly to Gmail. | “The team confirms a move to Level 5, Room 502. I return to the customer email, which still says third floor.” |
+| 0:42–0:58 | Let the native notice appear. Keep a short beat before opening it. | “LivingThread shows up beside the draft. It recognized the same event across the conversation, the brief, and this email.” |
+| 0:58–1:14 | Click Review the connection →. Show What connects these details. | “Here are the exact source quotes. It identifies the confirmed change and shows which current wording is out of date.” |
+| 1:14–1:29 | Show both exact previews and click Apply 2 changes once. | “It proposes precise updates to the document and draft. The time and presenter stay unchanged. I review both changes and approve them here.” |
+| 1:29–1:50 | Wait for both saved results, then show the updated Gmail wording and Doc. Verify the later cross-app check before narrating resolution. | “Both applications save the changes, and LivingThread checks the results. The email remains a draft. After checking again, it reports no remaining venue conflict.” |
+| 1:50–2:00 | Finish on the corrected work and its result panel. | “An agent that notices when help is needed, right where I'm working. LivingThread: different apps, one living thread.” |
 
-The model may choose a longer unique substring than “third floor,” or include “Level 5, Room 502.” Narrate the actual displayed proposal. Do not force a specific generated summary or manufacture an exact checkbox count; **Apply 2 changes** is the current UI label only when two valid edits are available and selected.
+## Preserve the moment that demonstrates the theme
 
-## Acceptance before recording the final version
+Keep **Slack change → return to Gmail → automatic notice** continuous wherever practical. Do not open the extension popup or a comparison chat to summon the notice. Let it appear before clicking it, so viewers can distinguish the agent's appearance from the user's later review.
 
-1. No manual Thread enrollment or comparison prompt was needed; the finding came from real observations and a real model call.
-2. The in-page notice appeared automatically in the relevant Gmail composer. Record actual change-to-notice time separately from any video edit.
-3. Both proposals quote exact existing text, name the correct targets, and preserve 15:00–15:30 HKT and unrelated wording.
-4. Both native applications contain the approved changes after a saved-state check. **Operation results** agrees with the actual outcome. Gmail was not sent.
-5. A separate failure check confirms changed/unavailable targets produce a failure or uncertain result, rather than false success. Do not spend the main two-minute story demonstrating every branch.
+Keep a longer raw capture when needed. If the key sequence is too slow for the target, use another take or visibly label a cut/speed-up such as **Waiting accelerated**. Do not claim edited waiting time is measured response latency, and do not splice a warning or result from a different take into the causal sequence.
 
-If a target reports `failed` or `uncertain`, stop the success narration and say: **“This edit has not been verified. LivingThread reports that separately so I can inspect the target.”** Preserve that outcome, fix the integration, and repeat the rehearsal before recording a successful full-flow claim.
+Session permission remains part of the product. It is completed before recording for pacing; be ready to show Connected · work session active during questions. Do not imply the product observes unapproved sources or requires no setup.
 
-## Optional explanation for questions after the video
+## Verify before narrating success
 
-The actual UI offers **This difference is intentional…**, an **Explain the difference** field, and **Reconsider with this context**. A clarification triggers another interpretation; it does not authorize a write. Pending findings say **Keep the decision open** and retain existing arrangements. A useful Slack communication has an **Exact message** preview showing the channel, parent thread, LivingThread identity, and audience before a **Send message** approval. These branches should be described as implemented features until separately verified in the real application.
+1. The baseline agrees across the three applications. The Doc/email's shorter third-floor wording is compatible with Level 3, Room 301.
+2. The native Gmail notice arises from the actual Slack update, without manual resource enrollment or a comparison request.
+3. The two proposals target the correct Doc and draft, preserve the date, 15:00–15:30 HKT time and presenter, and change only the relevant wording. Generated exact substrings may vary.
+4. Both operations say succeeded, and both applications contain the approved venue. Gmail remains a draft.
+5. The post-write check finishes without a remaining venue conflict. The old Slack message remains historical context.
+6. In rehearsal, also reload/reopen both saved resources. Capture the result panel before a full Gmail reload because composer identity changes across reloads.
 
-### Coordination branch for a separate rehearsal
+For failed or uncertain results, stop the success narration and say: **“This edit has not been verified. LivingThread reports that separately so I can inspect the target.”** Inspect the actual editor and preserve the receipt before another attempt. A saved edit and a failed model recheck are separate outcomes.
 
-Keep the confirmed customer demo at 15:00–15:30 HKT and Level 5, Room 502. In a separate recipientless Gmail draft, propose moving it to 16:00–16:30 HKT and explicitly state that the team and facilities have not agreed. Keep the original customer draft saved.
+## Optional branch for questions
 
-Expected behavior: a pending notice, with no speculative document or draft replacement. If the appropriate audience is unclear, explain that the observed Slack conversation is the internal coordination thread. Inspect any proposed Slack question, its exact destination, and its wording before approval. The message must ask about agreement rather than announce a confirmed change. Sending the question does not confirm the proposed time.
+This difference is intentional… → Reconsider with this context changes interpretation without approving an action. A pending time proposal retains the confirmed plan. In a separate live check, identifying the appropriate internal audience led to an exact Slack question preview; the owner approved it, LivingThread posted it, and the next analysis did not propose a duplicate question.
 
-Suggested narration: “This time the change is only a proposal. LivingThread keeps the confirmed plan and helps me ask the relevant team before updating customer details.”
-
-This is a separate functional check. The main two-minute video remains focused on the complete venue-change story. Creating this rehearsal plan does not authorize an external message.
+Keep that branch out of the main venue-change take. It uses a separate scenario and draft. A new bot question requires review, and sending it does not confirm the proposed arrangement.
 
 ## Final recording record
 
 | Field | Value |
 | --- | --- |
-| Recording date/time and Git revision | TODO after successful rehearsal |
-| Browser/version and account profile | TODO; redact personal account identifiers in public materials |
-| Slack observation and exact target channel verified | TODO |
-| Observed change-to-notice latency | TODO; preserve actual timing |
-| Gmail save/reopen check | TODO |
-| Google Docs save/reload check | TODO |
-| Both operation results | TODO; record actual statuses |
-| Final video URL and duration | TODO; at most two minutes |
+| Take, date/time, Git revision | TODO after actual recording |
+| Browser and extension versions | TODO; omit private account identifiers |
+| Baseline source/read check | TODO |
+| Actual change-to-notice latency | TODO; separate from edited duration |
+| Docs/Gmail saved results and resolution | TODO |
+| Cuts or accelerated waits | TODO |
+| Public video URL and duration | TODO; at most two minutes |

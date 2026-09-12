@@ -1,6 +1,6 @@
 # Slack setup
 
-LivingThread uses its own Slack app, bot token, and Socket Mode connection. It does not use the development assistant's Slack connection. In the September 12 live checkpoint, the app is installed, its Socket Mode connection is active in a dedicated allowed channel, and two explicitly owner-approved synthetic messages have been received through the product adapter. Those messages were created by the development assistant as the signed-in user; they do not establish successful posting through LivingThread's reviewed bot-message action. That action remains to be validated. New installations still need the setup below.
+LivingThread uses its own Slack app, bot token, and Socket Mode connection. It does not use the development assistant's Slack connection. In the September 12 live checkpoint, the installed app received two explicitly approved synthetic messages through its own adapter. Those original messages were created as the signed-in user. A separate exact-message approval later exercised LivingThread's reviewed bot action: its question appeared in the intended Slack thread and the next analysis proposed no duplicate question. See [live acceptance](LIVE_ACCEPTANCE.md) for the distinct checks. New installations still need the setup below.
 
 ## Create and install the app
 
@@ -86,7 +86,7 @@ Run `node --test tests/slack.test.mjs`. Tests inject a fake fetch implementation
 
 The current real connection received the synthetic baseline and a facilities-confirmed venue change. Together with the actual Docs/Gmail observations, the baseline produced zero findings; the change produced one conflict and two editor replacements, with no unnecessary Slack message. See [live acceptance](LIVE_ACCEPTANCE.md). No private channel IDs, account identifiers, or message links are included in these shared instructions.
 
-Real edit/deletion handling and product bot posting still need their own acceptance checks. The owner can edit a short synthetic message in the allowed demo channel and check that LivingThread replaces its observation under the same identity; a deletion should invalidate the old evidence. Test real reviewed posting separately only after approval of a specific message and destination. Successful fixture-message delivery does not prove those other behaviors.
+Live message edit/deletion handling remains unverified. The owner can edit a short synthetic message in the allowed demo channel and check that LivingThread replaces its observation under the same identity; a deletion should invalidate the old evidence. The reviewed bot-posting check is now recorded separately in live acceptance. Any additional message still requires its specific review; successful fixture observation does not establish every event behavior.
 
 | Status | Next check |
 | --- | --- |
@@ -98,4 +98,4 @@ Real edit/deletion handling and product bot posting still need their own accepta
 | `reconnecting` | Network or Slack refresh; cached evidence is not live |
 | Post `uncertain` | Inspect Slack; do not blindly retry or replace the operation ID |
 
-Implementation was created during the official hackathon period. Official documentation above was checked on September 12, 2026. Real installation, connection, and message receipt are now supported by live evidence; synthetic tests are kept separate, and reviewed bot posting remains pending.
+Implementation was created during the official hackathon period. Official documentation above was checked on September 12, 2026. Real installation, connection, message receipt, and one reviewed bot reply are supported by live evidence. Synthetic tests remain separate from those checks.

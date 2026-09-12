@@ -22,6 +22,8 @@ The implementation provides an in-page review panel for evidence, exact before/a
 
 ## Run the prototype
 
+For a first hands-on rehearsal, follow the [operator guide](docs/OPERATOR_GUIDE.md), use its separate rehearsal/recording/retake text packs, and read the [two-minute script](docs/DEMO_SCRIPT.md). The guide explains which pages to open, how observation starts, what each review step should show, and how to repeat a take without confusing old context with a new event.
+
 Requirements: **Node.js 22 or newer**, a Chromium desktop browser, an Azure deployment supporting the Responses API and structured output, and signed-in Google accounts for the pages you want to use. Edge is the first live validation target; Chrome compatibility is not yet verified. No npm packages or extension build step are required.
 
 1. From the repository root, copy [.env.example](.env.example) to `.env` **only if you do not already have a configured `.env`**. Fill in the Azure key, endpoint, and deployment. Process environment variables override values in `.env`.
