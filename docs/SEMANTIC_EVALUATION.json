@@ -1,0 +1,123 @@
+{
+  "description": "Real Azure model calls using synthetic observations only. No app writes or communications executed.",
+  "limitations": [
+    "This small evaluation measures specified semantic scenarios, not general reliability.",
+    "It does not validate browser or Slack integration, observation freshness, or saved edits.",
+    "Reported latency covers the model request and engine validation; it excludes app observation and UI delays."
+  ],
+  "runs": [
+    {
+      "startedAt": "2026-09-12T03:05:34.537Z",
+      "model": "gpt-5.6-sol",
+      "reasoningEffort": "low",
+      "requestCount": 5,
+      "passed": 5,
+      "cases": [
+        {
+          "id": "confirmed-venue-change",
+          "attempt": 1,
+          "expected": "One conflict with reviewed Gmail and Docs replacements to the fifth floor; no redundant Slack message.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 1,
+          "replacementCount": 2,
+          "slackMessageCount": 0,
+          "latencyMs": 7581,
+          "summaries": [
+            {
+              "kind": "conflict",
+              "summary": "The confirmed venue is Level 5, Room 502, but the editable demo brief and customer email draft still direct attendees to the third floor.",
+              "actionCount": 2
+            }
+          ],
+          "usage": {
+            "input_tokens": 1539,
+            "output_tokens": 574,
+            "total_tokens": 2113
+          }
+        },
+        {
+          "id": "existing-conflict",
+          "attempt": 1,
+          "expected": "A conflict correcting the Gmail draft only; the already-consistent document receives no edit.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 1,
+          "replacementCount": 1,
+          "slackMessageCount": 0,
+          "latencyMs": 4718,
+          "summaries": [
+            {
+              "kind": "conflict",
+              "summary": "The customer arrival draft directs Morgan to the third floor, while the confirmed location is Level 5, Room 502.",
+              "actionCount": 1
+            }
+          ],
+          "usage": {
+            "input_tokens": 1388,
+            "output_tokens": 412,
+            "total_tokens": 1800
+          }
+        },
+        {
+          "id": "legitimate-times",
+          "attempt": 1,
+          "expected": "No finding or edit: staff setup is 14:30 HKT, and the customer presentation is 15:00 HKT / 3 PM HKT.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 0,
+          "replacementCount": 0,
+          "slackMessageCount": 0,
+          "latencyMs": 2739,
+          "summaries": [],
+          "usage": {
+            "input_tokens": 1357,
+            "output_tokens": 65,
+            "total_tokens": 1422
+          }
+        },
+        {
+          "id": "tentative-proposal",
+          "attempt": 1,
+          "expected": "A pending finding with no replacements. Do not repeat the Slack question that was already asked.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 1,
+          "replacementCount": 0,
+          "slackMessageCount": 0,
+          "latencyMs": 5140,
+          "summaries": [
+            {
+              "kind": "pending",
+              "summary": "A move from 15:00–15:30 HKT to 16:00–16:30 HKT is proposed but not confirmed.",
+              "actionCount": 0
+            }
+          ],
+          "usage": {
+            "input_tokens": 1566,
+            "output_tokens": 484,
+            "total_tokens": 2050
+          }
+        },
+        {
+          "id": "unrelated-event",
+          "attempt": 1,
+          "expected": "No finding: different Atlas customer demos on 18 and 25 September have different venues.",
+          "pass": true,
+          "failures": [],
+          "findingCount": 0,
+          "replacementCount": 0,
+          "slackMessageCount": 0,
+          "latencyMs": 1482,
+          "summaries": [],
+          "usage": {
+            "input_tokens": 1228,
+            "output_tokens": 14,
+            "total_tokens": 1242
+          }
+        }
+      ],
+      "completedAt": "2026-09-12T03:05:56.210Z"
+    }
+  ]
+}

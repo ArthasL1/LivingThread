@@ -1,0 +1,657 @@
+{
+  "checked_at_utc": "2026-09-11T15:20:57.935437+00:00",
+  "purpose": "Generic API readiness checks before the event; no LivingThread semantic prompts, app adapters, or action orchestration.",
+  "endpoint_path": "/openai/v1/responses",
+  "reasoning_effort": "low",
+  "max_output_tokens": 512,
+  "latency_definition": "Non-streaming wall time from request start until complete JSON body is received and decoded; includes local network and server time.",
+  "comparability": "Three small structured-output requests and three function-call requests per deployment. The tool-call repeats were added after an 8.063-second Sol result to examine variability. This is not a statistically reliable intelligence ranking or production latency estimate. Functions were proposed only, never executed.",
+  "cases": [
+    {
+      "id": "inventory_1",
+      "input": "Return count (sum of quantities), total (sum of quantity times unit price), and codes sorted alphabetically, for active rows only. Rows: C active quantity 3 unit price 11; B cancelled quantity 100 unit price 9; A active quantity 4 unit price 7.",
+      "expected": {
+        "count": 7,
+        "total": 61,
+        "codes": [
+          "A",
+          "C"
+        ]
+      }
+    },
+    {
+      "id": "inventory_2",
+      "input": "Return count (sum of quantities), total (sum of quantity times unit price), and codes sorted alphabetically, for active rows only. Rows: Z cancelled quantity 50 unit price 3; D active quantity 2 unit price 13; B active quantity 5 unit price 6.",
+      "expected": {
+        "count": 7,
+        "total": 56,
+        "codes": [
+          "B",
+          "D"
+        ]
+      }
+    },
+    {
+      "id": "inventory_3",
+      "input": "Return count (sum of quantities), total (sum of quantity times unit price), and codes sorted alphabetically, for active rows only. Rows: F active quantity 6 unit price 8; A cancelled quantity 3 unit price 14; E active quantity 1 unit price 17.",
+      "expected": {
+        "count": 7,
+        "total": 65,
+        "codes": [
+          "E",
+          "F"
+        ]
+      }
+    }
+  ],
+  "json_schema": {
+    "type": "object",
+    "properties": {
+      "count": {
+        "type": "integer"
+      },
+      "total": {
+        "type": "integer"
+      },
+      "codes": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "count",
+      "total",
+      "codes"
+    ],
+    "additionalProperties": false
+  },
+  "results": [
+    {
+      "http": 200,
+      "seconds": 3.143,
+      "case": "inventory_1",
+      "requested_deployment": "gpt-5.6-sol",
+      "returned_model": "gpt-5.6-sol",
+      "status": "completed",
+      "passed": true,
+      "parsed_output": {
+        "count": 7,
+        "total": 61,
+        "codes": [
+          "A",
+          "C"
+        ]
+      },
+      "usage": {
+        "input_tokens": 107,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 24,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 131
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 3.686,
+      "case": "inventory_1",
+      "requested_deployment": "gpt-5.6-terra",
+      "returned_model": "gpt-5.6-terra",
+      "status": "completed",
+      "passed": true,
+      "parsed_output": {
+        "count": 7,
+        "total": 61,
+        "codes": [
+          "A",
+          "C"
+        ]
+      },
+      "usage": {
+        "input_tokens": 107,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 24,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 131
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 3.483,
+      "case": "inventory_1",
+      "requested_deployment": "gpt-5.6-luna",
+      "returned_model": "gpt-5.6-luna",
+      "status": "completed",
+      "passed": true,
+      "parsed_output": {
+        "count": 7,
+        "total": 61,
+        "codes": [
+          "A",
+          "C"
+        ]
+      },
+      "usage": {
+        "input_tokens": 107,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 54,
+        "output_tokens_details": {
+          "reasoning_tokens": 28
+        },
+        "total_tokens": 161
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 2.325,
+      "case": "inventory_2",
+      "requested_deployment": "gpt-5.6-sol",
+      "returned_model": "gpt-5.6-sol",
+      "status": "completed",
+      "passed": true,
+      "parsed_output": {
+        "count": 7,
+        "total": 56,
+        "codes": [
+          "B",
+          "D"
+        ]
+      },
+      "usage": {
+        "input_tokens": 107,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 24,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 131
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 2.621,
+      "case": "inventory_2",
+      "requested_deployment": "gpt-5.6-terra",
+      "returned_model": "gpt-5.6-terra",
+      "status": "completed",
+      "passed": true,
+      "parsed_output": {
+        "count": 7,
+        "total": 56,
+        "codes": [
+          "B",
+          "D"
+        ]
+      },
+      "usage": {
+        "input_tokens": 107,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 49,
+        "output_tokens_details": {
+          "reasoning_tokens": 23
+        },
+        "total_tokens": 156
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 2.621,
+      "case": "inventory_2",
+      "requested_deployment": "gpt-5.6-luna",
+      "returned_model": "gpt-5.6-luna",
+      "status": "completed",
+      "passed": true,
+      "parsed_output": {
+        "count": 7,
+        "total": 56,
+        "codes": [
+          "B",
+          "D"
+        ]
+      },
+      "usage": {
+        "input_tokens": 107,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 59,
+        "output_tokens_details": {
+          "reasoning_tokens": 33
+        },
+        "total_tokens": 166
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 2.942,
+      "case": "inventory_3",
+      "requested_deployment": "gpt-5.6-sol",
+      "returned_model": "gpt-5.6-sol",
+      "status": "completed",
+      "passed": true,
+      "parsed_output": {
+        "count": 7,
+        "total": 65,
+        "codes": [
+          "E",
+          "F"
+        ]
+      },
+      "usage": {
+        "input_tokens": 107,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 24,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 131
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 3.167,
+      "case": "inventory_3",
+      "requested_deployment": "gpt-5.6-terra",
+      "returned_model": "gpt-5.6-terra",
+      "status": "completed",
+      "passed": true,
+      "parsed_output": {
+        "count": 7,
+        "total": 65,
+        "codes": [
+          "E",
+          "F"
+        ]
+      },
+      "usage": {
+        "input_tokens": 107,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 51,
+        "output_tokens_details": {
+          "reasoning_tokens": 25
+        },
+        "total_tokens": 158
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 3.261,
+      "case": "inventory_3",
+      "requested_deployment": "gpt-5.6-luna",
+      "returned_model": "gpt-5.6-luna",
+      "status": "completed",
+      "passed": true,
+      "parsed_output": {
+        "count": 7,
+        "total": 65,
+        "codes": [
+          "E",
+          "F"
+        ]
+      },
+      "usage": {
+        "input_tokens": 107,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 54,
+        "output_tokens_details": {
+          "reasoning_tokens": 28
+        },
+        "total_tokens": 161
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 8.063,
+      "case": "generic_function_call",
+      "requested_deployment": "gpt-5.6-sol",
+      "returned_model": "gpt-5.6-sol",
+      "status": "completed",
+      "passed": true,
+      "tool_calls": [
+        {
+          "name": "multiply",
+          "arguments": "{\"a\":17,\"b\":23}"
+        }
+      ],
+      "usage": {
+        "input_tokens": 55,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 21,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 76
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 2.581,
+      "case": "generic_function_call",
+      "requested_deployment": "gpt-5.6-terra",
+      "returned_model": "gpt-5.6-terra",
+      "status": "completed",
+      "passed": true,
+      "tool_calls": [
+        {
+          "name": "multiply",
+          "arguments": "{\"a\":17,\"b\":23}"
+        }
+      ],
+      "usage": {
+        "input_tokens": 55,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 21,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 76
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 2.79,
+      "case": "generic_function_call",
+      "requested_deployment": "gpt-5.6-luna",
+      "returned_model": "gpt-5.6-luna",
+      "status": "completed",
+      "passed": true,
+      "tool_calls": [
+        {
+          "name": "multiply",
+          "arguments": "{\"a\":17,\"b\":23}"
+        }
+      ],
+      "usage": {
+        "input_tokens": 55,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 21,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 76
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 2.745,
+      "case": "generic_function_call_repeat_2",
+      "requested_deployment": "gpt-5.6-sol",
+      "returned_model": "gpt-5.6-sol",
+      "status": "completed",
+      "passed": true,
+      "tool_calls": [
+        {
+          "name": "multiply",
+          "arguments": "{\"a\":17,\"b\":23}"
+        }
+      ],
+      "usage": {
+        "input_tokens": 55,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 21,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 76
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 2.551,
+      "case": "generic_function_call_repeat_2",
+      "requested_deployment": "gpt-5.6-terra",
+      "returned_model": "gpt-5.6-terra",
+      "status": "completed",
+      "passed": true,
+      "tool_calls": [
+        {
+          "name": "multiply",
+          "arguments": "{\"a\":17,\"b\":23}"
+        }
+      ],
+      "usage": {
+        "input_tokens": 55,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 21,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 76
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 4.811,
+      "case": "generic_function_call_repeat_2",
+      "requested_deployment": "gpt-5.6-luna",
+      "returned_model": "gpt-5.6-luna",
+      "status": "completed",
+      "passed": true,
+      "tool_calls": [
+        {
+          "name": "multiply",
+          "arguments": "{\"a\":17,\"b\":23}"
+        }
+      ],
+      "usage": {
+        "input_tokens": 55,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 21,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 76
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 1.982,
+      "case": "generic_function_call_repeat_3",
+      "requested_deployment": "gpt-5.6-sol",
+      "returned_model": "gpt-5.6-sol",
+      "status": "completed",
+      "passed": true,
+      "tool_calls": [
+        {
+          "name": "multiply",
+          "arguments": "{\"a\":17,\"b\":23}"
+        }
+      ],
+      "usage": {
+        "input_tokens": 55,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 21,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 76
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 5.718,
+      "case": "generic_function_call_repeat_3",
+      "requested_deployment": "gpt-5.6-terra",
+      "returned_model": "gpt-5.6-terra",
+      "status": "completed",
+      "passed": true,
+      "tool_calls": [
+        {
+          "name": "multiply",
+          "arguments": "{\"a\":17,\"b\":23}"
+        }
+      ],
+      "usage": {
+        "input_tokens": 55,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 21,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 76
+      }
+    },
+    {
+      "http": 200,
+      "seconds": 2.406,
+      "case": "generic_function_call_repeat_3",
+      "requested_deployment": "gpt-5.6-luna",
+      "returned_model": "gpt-5.6-luna",
+      "status": "completed",
+      "passed": true,
+      "tool_calls": [
+        {
+          "name": "multiply",
+          "arguments": "{\"a\":17,\"b\":23}"
+        }
+      ],
+      "usage": {
+        "input_tokens": 55,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 21,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 76
+      }
+    }
+  ],
+  "summary": [
+    {
+      "deployment": "gpt-5.6-sol",
+      "passed": 6,
+      "tests": 6,
+      "structured_output_latency_seconds": {
+        "n": 3,
+        "median": 2.942,
+        "min": 2.325,
+        "max": 3.143
+      },
+      "function_call_latency_seconds": {
+        "n": 3,
+        "median": 2.745,
+        "min": 1.982,
+        "max": 8.063
+      }
+    },
+    {
+      "deployment": "gpt-5.6-terra",
+      "passed": 6,
+      "tests": 6,
+      "structured_output_latency_seconds": {
+        "n": 3,
+        "median": 3.167,
+        "min": 2.621,
+        "max": 3.686
+      },
+      "function_call_latency_seconds": {
+        "n": 3,
+        "median": 2.581,
+        "min": 2.551,
+        "max": 5.718
+      }
+    },
+    {
+      "deployment": "gpt-5.6-luna",
+      "passed": 6,
+      "tests": 6,
+      "structured_output_latency_seconds": {
+        "n": 3,
+        "median": 3.261,
+        "min": 2.621,
+        "max": 3.483
+      },
+      "function_call_latency_seconds": {
+        "n": 3,
+        "median": 2.79,
+        "min": 2.406,
+        "max": 4.811
+      }
+    }
+  ],
+  "connectivity_checks": [
+    {
+      "deployment": "gpt-5.6-sol",
+      "http": 200,
+      "seconds": 2.688,
+      "text": "READY",
+      "input_tokens": 13,
+      "output_tokens": 5
+    },
+    {
+      "deployment": "gpt-5.6-terra",
+      "http": 200,
+      "seconds": 3.175,
+      "text": "READY",
+      "input_tokens": 13,
+      "output_tokens": 5
+    },
+    {
+      "deployment": "gpt-5.6-luna",
+      "http": 200,
+      "seconds": 2.159,
+      "text": "READY",
+      "input_tokens": 13,
+      "output_tokens": 5
+    }
+  ],
+  "request_count": 21,
+  "reported_total_tokens": 2064
+}

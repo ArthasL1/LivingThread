@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LivingThread</title><link rel="stylesheet" href="popup.css"></head>
+<body><header><span class="mark" aria-hidden="true">↝</span><div><h1>LivingThread <span id="version" class="version"></span></h1><p>Different apps. One living thread.</p></div></header>
+<main><div id="connection" class="status" role="status" aria-live="polite">Checking the local service…</div>
+<p id="connection-detail" class="connection-detail"></p>
+<p class="intro">Keep shared details aligned while you work.</p>
+<button id="connect">Connect local service</button>
+<button id="session" disabled>Start work session</button>
+<p id="session-note" class="session-note" hidden></p>
+<p id="error" role="alert" hidden></p>
+<p class="scope">During a session, LivingThread observes open Google Docs and Gmail composers, plus configured Slack channels. Relevant text is sent to your configured Azure model. You review every edit and message.</p>
+<div id="summary"></div><div id="sources"></div>
+<details><summary>Connection &amp; editor diagnostics</summary><p>Local service: 127.0.0.1:4317</p><p id="action-status"></p><p class="scope">The Docs adapter uses the debugger permission for approved editor actions in Google Docs only. The extension detaches after each operation.</p><pre id="diagnostics"></pre></details>
+</main><footer>Agents Everywhere · Hackathon build</footer><script src="popup.js"></script></body></html>

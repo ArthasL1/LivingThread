@@ -1,0 +1,20 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local logs
+*.log
+
+# Private runtime state and local dependencies
+.runtime/
+node_modules/
+coverage/
+artifacts/private/
