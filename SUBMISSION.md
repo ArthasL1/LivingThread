@@ -1,6 +1,6 @@
 # LivingThread — Submission draft
 
-**Working draft, not submitted.** The real venue-change workflow has passed live acceptance, including both saved edits and reload persistence. Team details are owner-confirmed. Final recording, public repository visibility, social publication, and portal submission remain to be completed.
+**Submission materials; portal status requires confirmation.** The real venue-change workflow has passed live acceptance, including both saved edits and reload persistence. A 1:57 English demo now also shows an intentional arrival-time difference, its clarified wording, and a successful Gmail save. Team details are owner-confirmed. Public repository visibility, video/social publication, and portal submission require fresh confirmation.
 
 ## Project title
 
@@ -10,13 +10,7 @@
 
 ## Written description
 
-LivingThread is an agent for people coordinating work across Slack, Google Docs, and Gmail. It connects independently worded information about the same event, identifies meaningful inconsistencies, and brings evidence and proposed next steps into the page where the user is working.
-
-A team may confirm a new demo venue in Slack while a document and an email draft still say “the third floor.” During an enabled work session, LivingThread is designed to recognize that relationship automatically and surface a notice beside the affected draft. The user reviews source quotes and exact edits, then approves the specific actions they want. The service checks targets before execution and records each result, including failures and uncertainty.
-
-The prototype combines a browser extension, a local service, Azure model reasoning, and scoped Slack events. It distinguishes confirmed changes from proposals, legitimate audience differences, and unrelated events. Users do not have to anticipate an error, enroll each item, or assemble a comparison prompt. The first release focuses on dates, times, venues, and closely related arrangements.
-
-**Live validation:** The venue-change workflow ran in real Slack, Google Docs, and Gmail on September 12. LivingThread observed the two Slack messages through its own connection, automatically showed the Gmail notice, and applied both reviewed edits through its own extension. Both applications confirmed saving; the updated content persisted after reloading both pages. The final two-minute recording is still pending.
+Use the [copy-ready Project Description](docs/PROJECT_DESCRIPTION.md) for the portal. It covers the problem, why the cross-app environment matters, automatic in-page intervention, intentional differences, technical implementation, and validated behavior. Its examples match the [recommended 1:57 demo edit](docs/VIDEO_EDIT.md).
 
 ## Why this environment matters
 
@@ -59,7 +53,7 @@ Existing building blocks are the JavaScript/Node/browser runtimes, Azure models,
 | Required field | Draft/status |
 | --- | --- |
 | Title | LivingThread |
-| Written description | Draft above; finalize against observed behavior |
+| Written description | [Copy-ready portal description](docs/PROJECT_DESCRIPTION.md), matched to observed behavior and demo v2 |
 | Public GitHub repository | [ArthasL1/LivingThread](https://github.com/ArthasL1/LivingThread); code pushed, currently Private. Public visibility is required before submission |
 | Two-minute video | TODO: upload the verified demo and insert its public URL; confirm duration ≤ 2:00 |
 | Social post | TODO: publish after final review, using verified partner handles; insert public post URL |
