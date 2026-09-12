@@ -1,33 +1,36 @@
 # LivingThread — Demo edit record
 
-The first review copy is **1 minute 55 seconds**, exported at **1920 × 1080, 25 fps** as H.264/AAC MP4. It uses English male AI narration (`en-US-AndrewNeural`) and burned-in English captions, with a separate SRT and narration script. Publication and the entrant's review remain pending.
+The recommended review copy, **v2, is 1 minute 57 seconds**, exported at **1920 × 1080, 25 fps** as H.264/AAC MP4. It uses English male AI narration (`en-US-AndrewNeural`) and burned-in English captions, with a separate SRT and narration script. Publication and the entrant's review remain pending. The earlier 1:55 v1 remains available locally for comparison.
 
 ## Actual recorded story
 
-The entrant supplied two recordings of the Harbor customer demo. The first records the Slack venue change, LivingThread appearing in Google Docs, evidence review in Docs and Gmail, approval of two changes, and the updated applications. The continuation supplies a longer view of both successful save receipts and a later document change from Room 502 to Room 503.
+The entrant supplied four recordings of the Harbor customer demo. The first records the Slack venue change, LivingThread appearing in Google Docs, evidence review in Docs and Gmail, approval of two changes, and the updated applications. A continuation supplies a longer view of both successful save receipts. Two later recordings capture a connected intentional-difference case: the Gmail draft says 14:00, the entrant explains that Morgan should arrive one hour early, and LivingThread distinguishes arrival time from the confirmed 15:00–15:30 demo.
 
-The supplementary case is included because it demonstrates continued observation and a change originating in Docs. The edit shows its new finding and the proposed correction for review. It does not portray that proposed action as an automatic rollback or assert that Slack always determines the correct value.
+The intentional-difference case replaces v1's later Room 503 correction because it demonstrates an additional capability: the agent uses the person's explanation to preserve a valid difference and improve the wording. The revised proposal says “Please arrive at 14:00 HKT” while retaining the demo's 15:00–15:30 schedule. The footage includes the entrant approving this new proposal and Gmail reporting the rewritten draft saved successfully. Explaining a difference and approving an edit remain separate actions.
 
 | Edited time | Visible event |
 | --- | --- |
-| 0:00–0:07 | Theme and LivingThread title |
-| 0:07–0:21 | Existing Doc and Gmail wording |
-| 0:21–0:34 | Confirmed Slack venue change and return to Docs |
-| 0:34–0:42 | LivingThread appears inside Docs |
-| 0:42–0:55 | Evidence and the same connection in Gmail |
-| 0:55–1:04 | Exact Doc and Gmail replacement previews |
-| 1:04–1:15 | One approval, application, and save verification |
-| 1:15–1:24 | Updated Doc and saved Gmail draft |
-| 1:24–1:33 | Both successful operation receipts, enlarged |
-| 1:33–1:49 | Later Doc change to Room 503 and a new reviewed proposal |
-| 1:49–1:55 | LivingThread closing and Zeqi Li credit |
+| 0:00–0:05 | Theme and LivingThread title |
+| 0:05–0:15 | Existing Doc and Gmail wording |
+| 0:15–0:28 | Confirmed Slack venue change and return to Docs |
+| 0:28–0:36 | LivingThread appears inside Docs |
+| 0:36–0:46 | Evidence and the same connection in Gmail |
+| 0:46–0:54 | Exact Doc and Gmail replacement previews |
+| 0:54–1:05 | One approval, application, and save verification |
+| 1:05–1:14 | Updated Doc and saved Gmail draft |
+| 1:14–1:21 | Both successful operation receipts, enlarged |
+| 1:21–1:27 | Later Gmail time change and a new finding |
+| 1:27–1:35 | This difference is intentional; explain the early arrival |
+| 1:35–1:44 | Arrival time and demo time distinguished in a revised proposal |
+| 1:44–1:51 | Approve the rewrite; Gmail saves and verifies it |
+| 1:51–1:57 | LivingThread closing and Zeqi Li credit |
 
 ## Editing and evidence boundaries
 
 - The Slack-change-to-Docs-notice sequence uses a continuous source interval. Camera crops change without removing elapsed time in that interval.
 - The execution wait is accelerated by approximately 2.43× and labeled. Evidence, previews, and success receipts include labeled reading holds.
 - The longer receipts come from the entrant's continuation recording and are labeled as a later capture. The continuation also shows no open finding reported for that page after the earlier updates.
-- The later Room 503 example is clearly introduced as a new change in the same work session. Its review is shortened.
+- The intentional-difference example is introduced as a later change. Waiting and review are shortened and labeled; the second part is identified as a continuation capture. The two recordings represent a connected story supplied by the entrant, not a new warning manufactured for the edit.
 - Accidental Codex page switches and the ending Zoom portrait are excluded. Browser address bars, account-bearing tab titles, and the Windows taskbar are outside the video crops.
 - Application footage comes from the supplied recordings. No findings, edits, or success receipts were generated for the video. Intro/outro cards and explanatory text are editorial graphics.
 - The source audio is replaced by generated narration. No email is sent in the demonstration.

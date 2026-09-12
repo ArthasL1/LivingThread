@@ -1,6 +1,6 @@
 # LivingThread — Two-minute demo
 
-**Original recording plan; a 1:55 review edit now exists.** The entrant recorded the Harbor workflow and a continuation with a later Room 503 change. The actual edit uses English male AI narration and follows [the demo edit record](VIDEO_EDIT.md). The Cedar narration below remains the original operator plan; publication is pending. See [live acceptance](LIVE_ACCEPTANCE.md) for the earlier technical checks.
+**Original recording plan; the recommended v2 review edit is 1:57.** The entrant recorded the Harbor venue-change workflow and a later intentional-difference case that distinguishes Morgan's 14:00 arrival from the 15:00 demo. The actual edit uses English male AI narration and follows [the demo edit record](VIDEO_EDIT.md). The Cedar narration below remains the original operator plan; publication is pending. See [live acceptance](LIVE_ACCEPTANCE.md) for the earlier technical checks.
 
 The central story is visible: **LivingThread shows up inside existing work without waiting for a comparison prompt.** It notices related information drifting before the user has assembled a task for an assistant.
 
