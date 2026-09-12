@@ -1,13 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createSlackAdapter } from '../server/slack.mjs';
+import { WorkState } from '../server/state.mjs';
 
 const CHANNEL = 'C12345678';
 const TS = '1800000000.000001';
 const tick = () => new Promise(resolve => setImmediate(resolve));
 const json = data => ({ ok: true, status: 200, headers: new Headers(), json: async () => data });
 
-function fixture({ history = [], historyError, send, onObservation } = {}) {
+function fixture({ history = [], historyError, historyFetch, send, onObservation, onStatus } = {}) {
   const calls = [];
   const observations = [];
   const sockets = [];
@@ -21,12 +22,13 @@ function fixture({ history = [], historyError, send, onObservation } = {}) {
     botToken: 'synthetic-bot-token', appToken: 'synthetic-app-token', channelIds: [CHANNEL],
     WebSocketImpl: FakeWebSocket,
     onObservation: async observation => { observations.push(observation); await onObservation?.(observation); },
+    onStatus,
     fetchImpl: async (url, options) => {
       const method = url.split('/').at(-1);
       calls.push({ method, body: JSON.parse(options.body), options });
       if (method === 'auth.test') return json({ ok: true, team_id: 'T12345678', user_id: 'U12345678', bot_id: 'B12345678' });
       if (method === 'apps.connections.open') return json({ ok: true, url: 'wss://wss.slack.com/link/?ticket=synthetic' });
-      if (method === 'conversations.history') return json(historyError ? { ok: false, error: historyError } : { ok: true, messages: history });
+      if (method === 'conversations.history') return historyFetch ? historyFetch() : json(historyError ? { ok: false, error: historyError } : { ok: true, messages: history });
       if (method === 'chat.postMessage') return send ? send(JSON.parse(options.body)) : json({
         ok: true, channel: CHANNEL, ts: '1800000002.000001', message: { text: JSON.parse(options.body).text, thread_ts: JSON.parse(options.body).thread_ts },
       });
@@ -120,6 +122,89 @@ test('history denial is visible while events remain connected', async t => {
   assert.equal(f.adapter.getStatus().history[CHANNEL].ok, false);
   assert.equal(f.adapter.getStatus().history[CHANNEL].code, 'not_in_channel');
   assert.equal(f.adapter.getStatus().coverageGap, true);
+});
+
+function stateCallbacks(state) {
+  return {
+    onObservation: observation => state.observe(observation),
+    onStatus: status => {
+      if (!status.connected) {
+        for (const [id, observation] of state.observations) {
+          if (observation.app === 'slack') state.observations.set(id, { ...observation, stale: true });
+        }
+      }
+    },
+  };
+}
+
+test('resume redelivers identical successfully read history and refreshes WorkState freshness', async t => {
+  const state = new WorkState(); state.session.enabled = true;
+  const message = { type: 'message', ts: TS, text: 'Atlas stays on the third floor.', user: 'U99999999' };
+  const f = fixture({ history: [message], ...stateCallbacks(state) });
+  t.after(() => f.adapter.stop()); await f.ready();
+  const id = f.observations[0].id;
+  const beforeVersion = state.observations.get(id).version;
+  state.session.enabled = false; f.adapter.stop();
+  assert.equal(state.observations.get(id).stale, true);
+  state.observations.get(id).lastSeenAt = '2026-01-01T00:00:00.000Z';
+  state.session.enabled = true; await f.ready();
+  assert.equal(f.observations.length, 2);
+  assert.equal(f.observations[1].id, id);
+  assert.equal(f.observations[1].context.origin, 'history');
+  assert.equal(state.observations.get(id).stale, false);
+  assert.equal(state.observations.get(id).version, beforeVersion);
+  assert.notEqual(state.observations.get(id).lastSeenAt, '2026-01-01T00:00:00.000Z');
+  await f.event({ ...message, channel: CHANNEL }, { id: 'same-text-event' });
+  await f.event({ ...message, channel: CHANNEL }, { id: 'same-text-event' });
+  assert.equal(f.observations.length, 2, 'Identical events must not become repeated observations.');
+});
+
+test('connection alone, denied history, and absent history never refresh stale sources', async t => {
+  for (const [name, response] of [
+    ['denied', { ok: false, error: 'not_in_channel' }],
+    ['absent', { ok: true, messages: [] }],
+  ]) {
+    await t.test(name, async subtest => {
+      const state = new WorkState(); state.session.enabled = true;
+      let historyCalls = 0;
+      let releaseHistory;
+      const delayed = new Promise(resolve => { releaseHistory = resolve; });
+      const f = fixture({ ...stateCallbacks(state), historyFetch: () => {
+        historyCalls++;
+        return historyCalls === 1 ? json({ ok: true, messages: [{ type: 'message', ts: TS, text: 'Known baseline' }] }) : delayed;
+      } });
+      subtest.after(() => f.adapter.stop()); await f.ready();
+      const id = f.observations[0].id;
+      state.session.enabled = false; f.adapter.stop();
+      state.session.enabled = true; await f.ready();
+      assert.equal(f.adapter.getStatus().connected, true);
+      assert.equal(state.observations.get(id).stale, true, 'Hello/connected does not establish source freshness.');
+      releaseHistory(json(response)); await tick(); await tick();
+      assert.equal(state.observations.get(id).stale, true);
+      assert.equal(f.observations.length, 1);
+    });
+  }
+});
+
+test('fresh history delivery still rejects old revisions and cannot resurrect a deleted source', async t => {
+  const state = new WorkState(); state.session.enabled = true;
+  const staleMessage = { type: 'message', ts: TS, text: 'Third floor' };
+  const deletedTs = '1800000001.000001';
+  const f = fixture({ history: [staleMessage, { type: 'message', ts: deletedTs, text: 'Delete this message' }], ...stateCallbacks(state) });
+  t.after(() => f.adapter.stop()); await f.ready();
+  const changedId = `slack:T12345678:${CHANNEL}:${TS}`;
+  const deletedId = `slack:T12345678:${CHANNEL}:${deletedTs}`;
+  await f.event({ type: 'message', subtype: 'message_changed', channel: CHANNEL,
+    message: { ts: TS, text: 'Fifth floor', edited: { ts: '1800000005.000001' } } });
+  await f.event({ type: 'message', subtype: 'message_deleted', channel: CHANNEL, deleted_ts: deletedTs, event_ts: '1800000006.000001' });
+  state.session.enabled = false; f.adapter.stop();
+  const delivered = f.observations.length;
+  state.session.enabled = true; await f.ready();
+  assert.equal(f.adapter.getStatus().history[CHANNEL].ok, true);
+  assert.equal(f.observations.length, delivered, 'Older history must not be promoted as a fresh observation.');
+  assert.equal(state.observations.get(changedId).text, 'Fifth floor');
+  assert.equal(state.observations.get(changedId).stale, true);
+  assert.equal(state.observations.has(deletedId), false);
 });
 
 test('approved posts enforce destination and stable identifiers; duplicate calls send exactly once', async t => {

@@ -4,13 +4,30 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
 const code = await readFile(new URL('../extension/background.js', import.meta.url), 'utf8');
-function setup({ holdFirstState = false, exportResponse } = {}) {
+function setup({ holdFirstState = false, exportResponse, hangTabState = false, holdActions = false, holdFirstTabQuery = false } = {}) {
   let listener, token, paired = false, enabled = false, releasePoll;
+  let releaseTabQuery;
+  let queuedCommands = [];
+  const pendingActions = [];
+  const deliveredActions = [];
+  const publishedStates = [];
   const calls = [];
   const chrome = {
     runtime: { id: 'a'.repeat(32), onMessage: { addListener: value => { listener = value; } } },
     storage: { local: { get: async () => ({ token }), set: async value => { token = value.token; } } },
-    tabs: { query: async () => [], onRemoved: { addListener() {} }, onUpdated: { addListener() {} } },
+    tabs: { query: async () => {
+      if (holdFirstTabQuery) {
+        holdFirstTabQuery = false;
+        return new Promise(resolve => { releaseTabQuery = () => resolve([{ id: 12 }]); });
+      }
+      return hangTabState || releaseTabQuery ? [{ id: 12 }] : [];
+    },
+      sendMessage: async (tabId, message) => {
+        if (message.type === 'state') { publishedStates.push(message.state); return hangTabState ? new Promise(() => {}) : { ok: true }; }
+        deliveredActions.push({ tabId, ...message });
+        return holdActions ? new Promise(resolve => pendingActions.push(resolve)) : { ok: true };
+      },
+      onRemoved: { addListener() {} }, onUpdated: { addListener() {} } },
     action: { setBadgeText: async () => {}, setBadgeBackgroundColor: async () => {} },
     alarms: { create() {}, onAlarm: { addListener() {} } },
   };
@@ -30,14 +47,19 @@ function setup({ holdFirstState = false, exportResponse } = {}) {
     if (!paired || options.headers.Authorization !== 'Bearer test-only-token') return response(401, { error: 'Pair this extension.' });
     if (path === '/api/session') enabled = JSON.parse(options.body).enabled;
     if (path === '/api/observations') return response(200, { ok: true, changed: false });
-    if (path === '/api/commands') return response(200, []);
+    if (path === '/api/commands') { const batch = queuedCommands; queuedCommands = []; return response(200, batch); }
     return response(200, { session: { enabled }, observations: [], findings: [], operations: [] });
   };
-  vm.runInNewContext(code, { chrome, fetch, AbortSignal, console, URL });
+  vm.runInNewContext(code, { chrome, fetch, AbortSignal, console, URL, setTimeout: (callback, ms) => setTimeout(callback, ms).unref(), clearTimeout });
   return {
     calls,
     message: (value, sender = {}) => new Promise(resolve => listener(value, sender, resolve)),
     releasePoll: () => releasePoll(),
+    enqueueCommands: commands => { queuedCommands.push(...commands); },
+    deliveredActions,
+    finishNextAction: result => pendingActions.shift()(result),
+    publishedStates,
+    releaseTabQuery: () => releaseTabQuery(),
   };
 }
 
@@ -126,4 +148,54 @@ test('concurrent state requests share a real response instead of a cached succes
   const responses = await Promise.all([first, second]);
   assert.ok(responses.every(value => !value.connected && /^401:/.test(value.error)));
   assert.equal(bridge.calls.filter(call => call.path === '/api/state').length, 1);
+});
+
+test('an unresponsive Docs state recipient cannot freeze later service polling', { timeout: 1000 }, async () => {
+  const bridge = setup({ hangTabState: true });
+  const connected = await bridge.message({ type: 'connect' });
+  assert.equal(connected.connected, true);
+  const firstCount = bridge.calls.filter(call => call.path === '/api/state').length;
+  const later = await bridge.message({ type: 'state' });
+  assert.equal(later.connected, true);
+  assert.equal(bridge.calls.filter(call => call.path === '/api/state').length, firstCount + 1);
+  assert.equal(bridge.deliveredActions.length, 0);
+  assert.equal(bridge.calls.filter(call => call.path === '/api/approve').length, 0);
+});
+
+test('nonblocking state publication preserves one serial command pump without replay', { timeout: 1000 }, async () => {
+  const bridge = setup({ hangTabState: true, holdActions: true });
+  await bridge.message({ type: 'connect' });
+  bridge.enqueueCommands([
+    { operationId: 'first-operation', tabId: 12, action: { id: 'first-edit', kind: 'replace_text' } },
+    { operationId: 'second-operation', tabId: 24, action: { id: 'second-edit', kind: 'replace_text' } },
+  ]);
+  const first = bridge.message({ type: 'state' });
+  await new Promise(resolve => setImmediate(resolve));
+  const concurrent = bridge.message({ type: 'state' });
+  assert.deepEqual(bridge.deliveredActions.map(item => item.action.id), ['first-edit']);
+  bridge.finishNextAction({ ok: true, message: 'First edit verified.' });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(bridge.deliveredActions.map(item => item.action.id), ['first-edit', 'second-edit']);
+  assert.equal(bridge.calls.filter(call => call.path === '/api/results').length, 1);
+  bridge.finishNextAction({ ok: true, message: 'Second edit verified.' });
+  await Promise.all([first, concurrent]);
+  await bridge.message({ type: 'state' });
+  assert.equal(bridge.deliveredActions.length, 2);
+  assert.equal(bridge.calls.filter(call => call.path === '/api/results').length, 2);
+  assert.equal(bridge.calls.filter(call => call.path === '/api/approve').length, 0);
+});
+
+test('a delayed old tab lookup cannot broadcast stale session state over a newer snapshot', { timeout: 1000 }, async () => {
+  const bridge = setup({ holdFirstTabQuery: true });
+  await bridge.message({ type: 'connect' });
+  assert.equal(bridge.publishedStates.length, 0, 'The paused snapshot is waiting on its tab lookup.');
+  await bridge.message({ type: 'session', enabled: true });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(bridge.publishedStates.length, 1);
+  assert.equal(bridge.publishedStates[0].session.enabled, true);
+  bridge.releaseTabQuery();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(bridge.publishedStates.length, 1, 'The obsolete paused snapshot must be discarded.');
+  assert.equal(bridge.deliveredActions.length, 0);
+  assert.equal(bridge.calls.filter(call => call.path === '/api/approve').length, 0);
 });

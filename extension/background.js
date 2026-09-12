@@ -23,6 +23,25 @@ async function pump() {
   try { return await pumping; }
   finally { pumping = null; }
 }
+function withDeadline(promise, milliseconds) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('The page did not acknowledge the state update.')), milliseconds);
+    Promise.resolve(promise).then(value => { clearTimeout(timer); resolve(value); }, error => { clearTimeout(timer); reject(error); });
+  });
+}
+async function publishState(snapshot) {
+  // A suspended tab or an unacknowledged message must never hold the service pump.
+  // Polling pages still receive the current snapshot directly from their request.
+  Promise.allSettled([
+    chrome.action.setBadgeText({ text: snapshot.findings?.length ? String(snapshot.findings.length) : '' }),
+    chrome.action.setBadgeBackgroundColor({ color: '#ad623a' }),
+  ]).catch(() => {});
+  const tabs = await withDeadline(chrome.tabs.query({ url: ['https://mail.google.com/*', 'https://docs.google.com/document/d/*'] }), 2500);
+  // A slow tab lookup may finish after a newer service snapshot has already been
+  // published. Never fan out that obsolete snapshot over the newer page state.
+  if (snapshot !== cachedState) return;
+  await Promise.allSettled(tabs.map(tab => withDeadline(chrome.tabs.sendMessage(tab.id, { type: 'state', state: snapshot }), 2500)));
+}
 async function pumpOnce() {
   try {
     cachedState = { ...(await api('/api/state')), connected: true };
@@ -34,10 +53,7 @@ async function pumpOnce() {
       await api('/api/results', { operationId: command.operationId, result });
     }
     if (commands.length) cachedState = { ...(await api('/api/state')), connected: true };
-    await chrome.action.setBadgeText({ text: cachedState.findings?.length ? String(cachedState.findings.length) : '' });
-    await chrome.action.setBadgeBackgroundColor({ color: '#ad623a' });
-    const tabs = await chrome.tabs.query({ url: ['https://mail.google.com/*', 'https://docs.google.com/document/d/*'] });
-    await Promise.allSettled(tabs.map(tab => chrome.tabs.sendMessage(tab.id, { type: 'state', state: cachedState })));
+    publishState(cachedState).catch(() => {});
   } catch (error) { cachedState = { ...cachedState, connected: false, error: error.message }; }
   return cachedState;
 }

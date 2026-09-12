@@ -133,7 +133,10 @@ export function createSlackAdapter({
     const threadTs = TS_RE.test(message.thread_ts || '') ? message.thread_ts : previous?.threadTs || ts;
     if (previous && previous.text === text && previous.deleted === deleted && previous.threadTs === threadTs) {
       previous.revision = versionTs;
-      return;
+      // A successful history read is new freshness evidence, even when content is unchanged.
+      // Redeliver it so the owner can refresh sources marked stale during a pause/disconnect.
+      // Event retries and identical event payloads remain deduplicated.
+      if (origin !== 'history') return;
     }
     const record = { revision: versionTs, text, deleted, threadTs };
     messages.set(id, record);

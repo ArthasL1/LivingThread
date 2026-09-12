@@ -132,3 +132,20 @@ test('an application prefix or ambiguous identical Gmail composers cannot expose
   const prefixOnly = harness({ ...baseState, findings: [], observations: [], operations: [ops()[1]] }, { hostname: 'mail.google.com' });
   assert.doesNotMatch(prefixOnly.text(), /Review results|Actions in progress/);
 });
+
+test('a Slack-only action approved from Gmail remains visible without unrelated Slack receipt leakage', async () => {
+  const slack = { id: 'slack:atlas:proposal', app: 'slack', title: 'Atlas planning', url: 'https://app.slack.com/client/workspace/channel', context: { channelId: 'channel' }, observedAt: doc.observedAt };
+  const action = { id: 'slack-only-action', kind: 'slack_message', sourceId: slack.id, text: 'Alex, can facilities support 16:00?', channelId: 'channel', threadTs: '123.456' };
+  const finding = { ...initialFinding, id: 'gmail-slack-approval', kind: 'pending', actions: [action], evidence: [{ sourceId: mail.id, quote: '15:00', role: 'current' }, { sourceId: slack.id, quote: '16:00?', role: 'proposal' }] };
+  const initial = { ...baseState, observations: [mail, slack], findings: [finding], operations: [] };
+  const app = harness(initial, { hostname: 'mail.google.com', anchors: [mail.id] });
+  await approveBoth(app);
+  const sent = { id: 'sent-operation', findingId: finding.id, actionId: action.id, sourceId: slack.id, kind: action.kind, status: 'succeeded', message: 'Slack confirmed the message was posted.' };
+  const unrelated = { ...sent, id: 'other-operation', findingId: 'unrelated-finding', actionId: 'other-action', message: 'UNRELATED SLACK RECEIPT' };
+  app.update({ ...initial, findings: [], operations: [sent, unrelated] });
+  assert.match(app.text(), /Reviewed actions completed/);
+  assert.match(app.text(), /1 of 1 actions verified/);
+  assert.match(app.text(), /Slack · succeeded/);
+  assert.doesNotMatch(app.text(), /UNRELATED SLACK RECEIPT/);
+  assert.equal(app.requests.length, 1);
+});

@@ -71,6 +71,16 @@ If a target reports `failed` or `uncertain`, stop the success narration and say:
 
 The actual UI offers **This difference is intentional…**, an **Explain the difference** field, and **Reconsider with this context**. A clarification triggers another interpretation; it does not authorize a write. Pending findings say **Keep the decision open** and retain existing arrangements. A useful Slack communication has an **Exact message** preview showing the channel, parent thread, LivingThread identity, and audience before a **Send message** approval. These branches should be described as implemented features until separately verified in the real application.
 
+### Coordination branch for a separate rehearsal
+
+Keep the confirmed customer demo at 15:00–15:30 HKT and Level 5, Room 502. In a separate recipientless Gmail draft, propose moving it to 16:00–16:30 HKT and explicitly state that the team and facilities have not agreed. Keep the original customer draft saved.
+
+Expected behavior: a pending notice, with no speculative document or draft replacement. If the appropriate audience is unclear, explain that the observed Slack conversation is the internal coordination thread. Inspect any proposed Slack question, its exact destination, and its wording before approval. The message must ask about agreement rather than announce a confirmed change. Sending the question does not confirm the proposed time.
+
+Suggested narration: “This time the change is only a proposal. LivingThread keeps the confirmed plan and helps me ask the relevant team before updating customer details.”
+
+This is a separate functional check. The main two-minute video remains focused on the complete venue-change story. Creating this rehearsal plan does not authorize an external message.
+
 ## Final recording record
 
 | Field | Value |
