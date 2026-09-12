@@ -2,6 +2,8 @@
 
 **Different apps. One living thread.**
 
+Team **LivingThread** · Solo participant **Zeqi Li**.
+
 An agent that connects related information across apps, flags conflicts where you work, and helps coordinate the right updates. Built for the Agents Everywhere hackathon.
 
 **Status: the real observation-to-resolution workflow is verified.** Edge has v0.1.4 loaded. The product observed the personal-account Google Doc and Gmail draft, received actual Slack events, and displayed its native Gmail notice. The compatible baseline produced zero findings; a confirmed venue change produced one conflict and two proposed edits. Both were approved through LivingThread, saved by its adapters, and freshly verified after reloading both apps. A final live check correctly returned no findings after the historical-message correction. The reviewed result group now remains available as findings change; the Docs page can reopen it after a reload. See [live acceptance](docs/LIVE_ACCEPTANCE.md) for exact evidence and limits.

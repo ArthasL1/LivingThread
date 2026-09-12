@@ -3,6 +3,7 @@
 ## Identity and scope
 
 - This workspace is for LivingThread, a project for the Agents Everywhere hackathon.
+- The owner confirmed the team name is LivingThread and its sole human participant is Zeqi Li. Use this spelling in submission materials; portal registration remains a separate action.
 - Treat it as a product prototype and demo project, even though its parent directory is named Research.
 - Keep work inside this project directory unless the user requests otherwise.
 - Discuss the project with the user in Chinese. Write project artifacts, source comments, UI copy, documentation, and submission materials in English.

@@ -47,7 +47,7 @@ Maintain a provenance record of existing building blocks and event-built work, i
 ## Items to resolve
 
 - Official build start and end times, including any distinction from the local event schedule.
-- The owner will decide the team at the venue. The earlier portal check showed attendance confirmed and "No team yet"; no advance team creation is requested.
+- The owner has confirmed team **LivingThread**, with **Zeqi Li** as its sole participant. The earlier portal check showed attendance confirmed and "No team yet"; entering the confirmed team information in the portal remains a separate pending action.
 - Available build time. The owner does not consider team size or coding specialization a selection bottleneck; plan for a computer and phone.
 - Access to target applications, test accounts, devices, and relevant permissions.
 - Sponsor resources, starter repository, and the exact partner handles required for the social post.

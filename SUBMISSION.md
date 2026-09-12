@@ -1,6 +1,6 @@
 # LivingThread — Submission draft
 
-**Working draft, not submitted.** The real venue-change workflow has passed live acceptance, including both saved edits and reload persistence. Final recording, public repository visibility, team details, social publication, and portal submission remain to be completed.
+**Working draft, not submitted.** The real venue-change workflow has passed live acceptance, including both saved edits and reload persistence. Team details are owner-confirmed. Final recording, public repository visibility, social publication, and portal submission remain to be completed.
 
 ## Project title
 
@@ -63,7 +63,8 @@ Existing building blocks are the JavaScript/Node/browser runtimes, Azure models,
 | Public GitHub repository | [ArthasL1/LivingThread](https://github.com/ArthasL1/LivingThread); code pushed, currently Private. Public visibility is required before submission |
 | Two-minute video | TODO: upload the verified demo and insert its public URL; confirm duration ≤ 2:00 |
 | Social post | TODO: publish after final review, using verified partner handles; insert public post URL |
-| Team name and members | TODO: confirm at the event and enter the required names |
+| Team name | LivingThread — confirmed by the owner |
+| Team member | Zeqi Li — sole participant, confirmed by the owner; portal entry still pending |
 | Final validated revision | TODO: record the revision shown in the final video |
 | Portal submission confirmation | TODO: record only after actual submission |
 
@@ -71,7 +72,7 @@ Existing building blocks are the JavaScript/Node/browser runtimes, Azure models,
 
 **Do not publish until the live demo is validated and the handles/links are filled.**
 
-> We built LivingThread at Agents Everywhere: an agent that connects related details across Slack, Google Docs, and Gmail, surfaces inconsistencies where you work, and helps you review the right updates. Different apps. One living thread.
+> I built LivingThread at Agents Everywhere: an agent that connects related details across Slack, Google Docs, and Gmail, surfaces inconsistencies where you work, and helps you review the right updates. Different apps. One living thread.
 >
 > Demo: [VIDEO URL] · Code: [PUBLIC REPOSITORY URL]
 >
