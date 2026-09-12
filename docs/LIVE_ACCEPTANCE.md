@@ -2,11 +2,13 @@
 
 This record distinguishes the product's real integrations from synthetic tests and development-assistant browser actions. Account identifiers, private fixture URLs, and credentials are intentionally omitted.
 
-## September 12, 2026 checkpoint
+**Current summary:** v0.1.5 is the demonstrated build. The venue-change workflow passed real saved edits and reload persistence; the later owner-operated recording also shows an intentional arrival-time difference, a reviewed rewrite, and a successful Gmail save. Watch the [published 1:57 demo](https://youtu.be/GGgn0UvC4n0). Public visibility of the [repository](https://github.com/ArthasL1/LivingThread) was independently verified on September 12 through an unauthenticated GitHub API request returning `private: false`. Earlier version numbers, test counts, and repository visibility checks below are historical checkpoints, not the current release status.
+
+## Initial September 12, 2026 integration checkpoint
 
 | Check | Evidence | Result |
 | --- | --- | --- |
-| Extension pairing and loaded build | Initial pairing succeeded with v0.1.1 at approximately 03:38 UTC. Edge now has v0.1.4 loaded; the real service returns authenticated HTTP 200 responses. | Passed |
+| Extension pairing and loaded build | Initial pairing succeeded with v0.1.1 at approximately 03:38 UTC. At this checkpoint Edge had v0.1.4 loaded and the real service returned authenticated HTTP 200 responses. Later v0.1.5 checks are recorded below. | Passed |
 | Work-session activation | Owner clicked Start work session; service recorded `enabled: true` at 03:41:14 UTC. | Passed |
 | Gmail observation | The actual content adapter reported the open Atlas demo draft's subject/body to the service, 238 characters, editable and fresh. The draft was restored after a browser reload. | Passed for this synthetic personal-account draft; no inbox crawl or email send |
 | Google Docs observation | The product's authenticated export produced a fresh 336-character baseline observation from the intended personal-account document. | Passed for this fixture; multi-tab coverage remains unverified |
@@ -19,16 +21,15 @@ This record distinguishes the product's real integrations from synthetic tests a
 | Persistence after application reload | At approximately 04:16 UTC, both applications were reloaded and their own product adapters freshly re-observed the Level 5 / Room 502 wording. Original time, presenter, and remaining text were unchanged. | Passed for both real applications |
 | Post-write resolution | After the historical-message correction and service restart at approximately 04:18 UTC, all four actual sources were freshly observed. The real post-write check completed in 2,495 ms and returned `findings: []`. | Passed; the superseded Slack baseline no longer produced a warning |
 | Complete automatic notice → evidence → approval → saved changes → reload → resolution | Real observations produced the native notice and two proposals; the product applied the reviewed edits, verified both saves, freshly observed both after reload, and resolved the issue. | Passed for the dedicated live fixture |
-| Public repository requirement | The root agent inspected GitHub: the repository is private, and anonymous access returns 404. | Public submission requirement pending; uploaded does not mean public |
+| Repository visibility at this checkpoint | The root agent inspected GitHub: the repository was private and anonymous access returned 404. | Historical observation; superseded by the later successful unauthenticated public-repository check |
 
 The two Slack fixture messages were sent by the development assistant under explicit owner approval, using the signed-in user's identity. Their creation is test setup; their receipt through LivingThread's own adapter is product integration evidence. Neither fixture message was posted through LivingThread's approved bot-message action. The assistant later clicked the product's reviewed approval control; the actual text changes were carried out and verified by LivingThread's own adapters. No email was sent. Ordinary assistant browser editing is not counted as product saved-edit success.
 
-## Remaining issues
+## Limitations and reliability notes
 
 - **Analysis availability:** A subsequent v0.1.4 Gmail edit was saved successfully, but its post-write Azure analysis timed out. The UI retained the successful edit receipt and separately reported that the check was unavailable. The service now retries a timeout or transport failure once after a two-second delay. Cancellation stops a pending retry; pausing the session cancels the analysis. Both attempts can still fail, and their error remains explicit. Edits are never replayed by an analysis retry.
 - **Gmail receipt lifetime:** The current composer retains its action results as findings change. Gmail generates a new composer identity after a full page reload, so that new composer cannot recover its old receipt. The private operation journal retains the result, and the stable Docs source can reopen its relevant group.
 - **Extension state delivery:** A nonresponding page blocked the old extension's state-notification loop after a Slack action. Refreshing the test Doc released the wait, and the original Gmail panel displayed the verified Slack receipt without resending. v0.1.5 contains a tested nonblocking state-notification fix. The owner has reloaded it and both test pages have been refreshed. Live Slack message edit/deletion events remain unverified.
-- **Submission visibility:** The GitHub repository is currently private. Public visibility must be established before the required public-repository submission is complete.
 
 ## Earlier failures and resolved checks
 
@@ -54,7 +55,7 @@ The two Slack fixture messages were sent by the development assistant under expl
 - After loading the retry code, the real four-source check completed at approximately 04:33 UTC in 2,118 ms with zero findings and no error. A subsequent live service check paused during active analysis, verified clean cancellation, and restored the previously enabled session. No application actions were replayed.
 - A synthetic draft time difference first produced the expected time-conflict proposal. Submitting **Reconsider with this context** explained that the earlier slot was internal staff setup. The model then proposed retaining the time and changing the activity label to internal staff setup, with no Docs or Slack action. A later recheck accepted the clarified distinction without an edit proposal. This validates reinterpretation, not deterministic wording or guaranteed follow-up edits. No action was approved in this clarification branch; the fixture was restored afterward.
 
-Both edited resources have passed the application-reload check, and the original full-flow post-write analysis resolved the venue issue. Keep subsequent availability failures explicit and verify the final recording run independently.
+Both edited resources passed the application-reload check, and the original full-flow post-write analysis resolved the venue issue. Subsequent availability failures remain explicit. The later owner-recorded demonstration is documented separately below rather than inferred from this earlier run.
 
 ## Pending agreement and reviewed Slack coordination
 
@@ -70,3 +71,12 @@ Both edited resources have passed the application-reload check, and the original
 - A page-state notification no longer blocks the service pump. Query/acknowledgement waits are bounded, content scripts explicitly acknowledge state, and obsolete delayed broadcasts are discarded. Actual editor commands remain serial. Exact approved-operation receipts returned by the service reach the originating page immediately and cannot be downgraded by an older queued snapshot.
 - The owner reported reloading v0.1.5. The root agent refreshed Gmail and the test Doc. At **05:23 UTC**, the actual service had six fresh observations: the Doc, both saved Gmail drafts, two original Slack messages, and LivingThread's question. Both original 15:00–15:30 HKT arrangements and the distinct unconfirmed proposal were preserved. The latest real analysis reported one pending finding, zero actions, and no error. The native Gmail notice displayed that result. The private journal retained the same three completed editor operations and one completed Slack operation; no action was replayed.
 - The original stuck-recipient failure was observed live; its controlled recurrence is covered by automated tests. The reload check confirms normal live operation of the updated build, not a deliberately frozen real browser tab or another external send.
+
+## Owner-recorded demonstration and publication
+
+The owner subsequently operated the real applications and supplied four recordings of a separate **Harbor customer demo** fixture. The final [published video](https://youtu.be/GGgn0UvC4n0) is 1:57; its exact timeline and editing boundaries are recorded in [VIDEO_EDIT.md](VIDEO_EDIT.md).
+
+- The venue-change footage shows the Slack update, LivingThread appearing inside Google Docs, supporting evidence, exact Docs/Gmail proposals, user approval, changed application text, and both successful operation receipts. A continuation provides a longer view of **Google Docs · succeeded** and **Gmail · succeeded**.
+- The intentional-difference footage shows a Gmail time of 14:00 compared with the confirmed 15:00–15:30 demo. The owner selects **This difference is intentional** and explains, “Morgan should come 1 hour earlier.” The proposed revision then distinguishes arrival time from demo time. The owner separately approves that revision, and Gmail reports the updated draft saved with one verified action.
+- These are recorded product interactions, including the application's save confirmations. They do not add another independently instrumented application-reload test or another semantic-evaluation call to the earlier counts. The recording shows a revision of the relevant email sentence, not a rewrite of every part of the email. No email is sent.
+- The owner confirmed publication of the video and public visibility of the GitHub repository. A subsequent unauthenticated request to `https://api.github.com/repos/ArthasL1/LivingThread` returned `private: false` and default branch `main`, independently verifying public repository visibility on September 12. Completion of the event portal and social-post requirements is a separate submission task.

@@ -1,5 +1,7 @@
 # LivingThread Demo Cases
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 Status: Written preparation only. These cases have not been run against LivingThread. They are demo fixtures and expected product behavior, not model prompts, adapter code, or an implemented evaluation system. All people, messages, and arrangements below are fictional. The assistant owns preparation and later execution of these cases.
 
 ## Shared baseline

@@ -1,5 +1,7 @@
 # Model Readiness and Initial Selection
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 Checked on September 11, 2026 using the owner's Azure endpoint and local environment file. The owner authorizes small comparison requests and reports sufficient Azure budget. Credentials were used only for request authentication, were not displayed or copied into reports, and `.env` is covered by the existing Git ignore rule. The environment file was not modified.
 
 ## Initial choice

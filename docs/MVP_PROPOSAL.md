@@ -1,5 +1,7 @@
 # LivingThread: MVP Proposal and Decisions
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 Status: The owner endorses proactive discovery within an authorized work session and reviewed cross-app follow-through. The former mandatory "Track / Add to thread" sequence and draft-only endpoint are superseded. Exact session settings, permission mechanics, and implementation details remain to be validated. No integrations or core behavior are implemented.
 
 ## Owner direction and proposed implementation

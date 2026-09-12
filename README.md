@@ -2,133 +2,98 @@
 
 **Different apps. One living thread.**
 
-Team **LivingThread** · Solo participant **Zeqi Li**.
+An agent that notices shared details drifting across **Slack, Google Docs, and Gmail**, then shows up inside the document or draft where you are working—with evidence, proposed edits, and verified results.
 
-An agent that connects related information across apps, flags conflicts where you work, and helps coordinate the right updates. Built for the Agents Everywhere hackathon.
+**[Watch the 1:57 demo](https://youtu.be/GGgn0UvC4n0)** · [Run it locally](docs/SETUP.md) · [Architecture](docs/ARCHITECTURE.md) · [Submission](SUBMISSION.md)
 
-**Status: the real observation-to-resolution workflow is verified.** The owner has loaded v0.1.5 in Edge; fresh Docs/Gmail observations and the native Gmail notice were rechecked after reload. The product observed the personal-account Google Doc and Gmail draft, received actual Slack events, and displayed its native Gmail notice. The compatible baseline produced zero findings; a confirmed venue change produced one conflict and two proposed edits. Both were approved through LivingThread, saved by its adapters, and freshly verified after reloading both apps. A final live check correctly returned no findings after the historical-message correction. The reviewed result group now remains available as findings change; the Docs page can reopen it after a reload. See [live acceptance](docs/LIVE_ACCEPTANCE.md) for exact evidence and limits.
+[![LivingThread appears inside Google Docs after a related Slack update. Actual footage from the demo.](docs/assets/agent-shows-up.jpg)](https://youtu.be/GGgn0UvC4n0)
 
-The GitHub repository is currently **private**; the hackathon's public-repository requirement is still pending.
+Built for **Agents Everywhere** in Hong Kong · **Zeqi Li**, solo participant · **v0.1.5**
 
-Core implementation began on **September 12, 2026 at 02:54 UTC / 10:54 HKT**, after the owner confirmed that the official hackathon period had started. See [build provenance](docs/BUILD_PROVENANCE.md) for the preparation/build separation.
+[![Verify prototype](https://github.com/ArthasL1/LivingThread/actions/workflows/verify.yml/badge.svg)](https://github.com/ArthasL1/LivingThread/actions/workflows/verify.yml)
 
-## What LivingThread does
+## Why it belongs in the workflow
 
-Someone confirms a new demo venue in Slack. A Google Doc says “the third floor,” and an independently written Gmail draft tells the customer to “head to the third floor.” LivingThread is designed to recognize that these statements refer to the same event, surface the inconsistency beside the work, and propose precise corrections with source evidence.
+A team confirms a new venue in Slack. Its Google Doc still says “the third floor,” and an independently written customer email says “head to the third floor.” Each app looks reasonable on its own; together, they disagree.
 
-The user starts a work session and works normally. There is no required “Track” or “Add to thread” step. The agent associates observed information automatically and distinguishes confirmed changes from tentative proposals, historical arrangements, different audiences, and unrelated events.
+LivingThread uses the surrounding work to recognize the relationship and intervene. Start a work session, then work normally. **You do not need to notice the mistake first, write a comparison prompt, or manually enroll each item.** Slack supplies the conversation, Docs supplies the maintained plan, and Gmail supplies the message about to carry that plan forward.
 
-The implementation provides an in-page review panel for evidence, exact before/after edits, clarification, dismissal, and operation results. Model output only proposes actions. The user must approve specific actions before the service dispatches a Gmail/Docs edit or a Slack message. Gmail sending is not supported.
+The agent can also reconsider. A 14:00 arrival and a 15:00 demo can both be correct. Explain that Morgan should arrive an hour early, and LivingThread proposes wording that preserves the distinction. Your explanation changes the proposed action.
 
-## Run the prototype
+## What the demo proves
 
-For a first hands-on rehearsal, follow the [operator guide](docs/OPERATOR_GUIDE.md), use its separate rehearsal/recording/retake text packs, and read the [two-minute script](docs/DEMO_SCRIPT.md). The guide explains which pages to open, how observation starts, what each review step should show, and how to repeat a take without confusing old context with a new event.
+| Moment | Actual interaction |
+| --- | --- |
+| [0:15 — The plan changes](https://www.youtube.com/watch?v=GGgn0UvC4n0&t=15s) | A confirmed Slack venue update makes the existing Doc and Gmail draft outdated. |
+| [0:28 — The agent shows up](https://www.youtube.com/watch?v=GGgn0UvC4n0&t=28s) | LivingThread appears inside Google Docs and explains the connection; the finding is also available in Gmail. |
+| [0:46 — Review and act](https://www.youtube.com/watch?v=GGgn0UvC4n0&t=46s) | Review exact replacements, approve both edits, and see both applications report successful saves. |
+| [1:21 — Explain an intentional difference](https://www.youtube.com/watch?v=GGgn0UvC4n0&t=81s) | Explain the earlier arrival. Review the clarified wording, approve it, and see Gmail's saved result. |
 
-Requirements: **Node.js 22 or newer**, a Chromium desktop browser, an Azure deployment supporting the Responses API and structured output, and signed-in Google accounts for the pages you want to use. Edge is the first live validation target; Chrome compatibility is not yet verified. No npm packages or extension build step are required.
+| Approved changes, verified in both apps | Intentional difference, clearer wording |
+| :---: | :---: |
+| [![Google Docs and Gmail both report succeeded.](docs/assets/verified-results.jpg)](https://www.youtube.com/watch?v=GGgn0UvC4n0&t=74s) | [![The proposal preserves 14:00 arrival and the 15:00–15:30 demo.](docs/assets/intentional-difference.jpg)](https://www.youtube.com/watch?v=GGgn0UvC4n0&t=95s) |
 
-1. From the repository root, copy [.env.example](.env.example) to `.env` **only if you do not already have a configured `.env`**. Fill in the Azure key, endpoint, and deployment. Process environment variables override values in `.env`.
-2. Start the local service:
+These are recordings of the working extension in real applications, using fictional business details. The video labels shortened waits and reading holds. [Editing and evidence notes](docs/VIDEO_EDIT.md).
 
-   ```sh
-   node server/main.mjs
-   ```
+## Try it
 
-3. Check [the local health endpoint](http://127.0.0.1:4317/health). It should report `status: "ready"`. `modelConfigured` only confirms that a key is present; it is not an API connectivity test.
-4. Open your browser's extension manager, enable **Developer mode**, choose **Load unpacked**, and select this repository's `extension` directory. For Edge, the extension manager is `edge://extensions/`; for Chrome, it is `chrome://extensions/`.
-5. Open LivingThread from the browser toolbar and choose **Connect local service**, then **Start work session**. The popup must report **Connected · work session active**. Loading the extension alone does not start observation.
-6. Refresh already-open Gmail and Google Docs tabs after loading or reloading the extension. Use a dedicated demo browser profile and short synthetic documents/drafts while live validation continues.
-7. Open **Connection & editor diagnostics** in the popup to inspect collected sources, coverage, and Slack state. **Pause work session** stops new observation and checks; keep the service running while using the prototype.
+You need **Node.js 22+**, desktop **Microsoft Edge** (the validated browser), an Azure deployment supporting the Responses API and structured output, and signed-in Google Docs/Gmail pages. Slack requires your own app and allowed channel; [setup instructions include an app manifest](docs/SLACK_SETUP.md). Chrome is not yet independently validated.
 
-Keep port `4317` for this prototype: the extension and manifest currently target that port. The local service binds to `127.0.0.1`, and one extension identity is paired to the local runtime. Keep `.runtime/pairing.json` private. Do not remove the operation journal to troubleshoot pairing, because it protects against repeating uncertain actions.
-
-### Model configuration
-
-The initial deployment is **gpt-5.6-sol** with `low` reasoning effort. Configure a deployment name actually available in your Azure resource:
-
-```dotenv
-AZURE_OPENAI_API_KEY=your-azure-api-key
-AZURE_OPENAI_BASE_URL=https://YOUR-RESOURCE.openai.azure.com/openai/v1
-LIVINGTHREAD_MODEL=gpt-5.6-sol
-LIVINGTHREAD_REASONING=low
+```sh
+git clone https://github.com/ArthasL1/LivingThread.git
+cd LivingThread
 ```
 
-The service also recognizes the owner's existing `AZURE_OPENAI_MODEL_J_DEPLOYMENT` setting when `LIVINGTHREAD_MODEL` is absent. One deployment is used for the different analysis steps; no model router is required. The key stays in the service configuration and is not embedded in the extension.
+1. Copy [`.env.example`](.env.example) to `.env` if it does not already exist. Fill in your Azure configuration and, for the three-app demo, Slack tokens and channel ID.
+2. Run `node server/main.mjs` and leave it running. **There is no npm dependency installation or extension build step.**
+3. Open `edge://extensions/`, enable **Developer mode**, select **Load unpacked**, and choose the `extension` folder.
+4. Refresh your open Docs/Gmail pages. In the extension popup, click **Connect local service → Start work session**.
+5. Follow the [copy-ready Harbor scenario](docs/demo/take-01-rehearsal.md) and [operator guide](docs/OPERATOR_GUIDE.md) to produce a compatible baseline, post the venue change, and review the resulting notice.
 
-### Slack configuration
+**Scope and control:** use a dedicated browser profile with synthetic test content. An enabled session observes matching open Docs pages and Gmail composers in that profile, plus configured Slack channels. Observed text and context go to your Azure deployment. Every edit or Slack message needs explicit review and approval. Gmail sending is not implemented. [Full setup, scope, and troubleshooting](docs/SETUP.md).
 
-Follow [Slack setup](docs/SLACK_SETUP.md) for the importable app manifest, exact permissions, and installation steps. Supply `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, and a comma-separated `SLACK_CHANNEL_IDS` allowlist in `.env`. Restart the service after configuration changes.
+## How it works
 
-The public-channel setup uses bot `channels:history` and `chat:write`, an app-level `connections:write` token, and `message.channels` events. Add the app to each allowed channel through **Agents & apps → Add Agent or App**. Slack is reported as **unconfigured** when credentials or channel IDs are missing. No public callback server or tunnel is required. Installation, a real Socket Mode connection, receipt of the two approved synthetic fixture messages, and one reviewed bot reply are verified. The reply asked about an unconfirmed time proposal; the next check retained the existing arrangement and proposed no duplicate question. See [live acceptance](docs/LIVE_ACCEPTANCE.md) for the state-notification issue found during this check.
+```mermaid
+flowchart LR
+    Slack["Slack: allowed channels"] -->|Socket Mode + Web API| Service["Local Node.js service"]
+    Pages["Open Google Docs + Gmail drafts"] -->|Extension observations| Service
+    Service -->|Context + structured analysis| Model["Azure-hosted model"]
+    Model -->|Findings + proposed actions| Service
+    Service --> Review["In-page evidence and edit preview"]
+    Review -->|User approves exact action| Checks["Version and target checks"]
+    Checks --> Adapters["Application adapters"]
+    Adapters --> Saved["Save verification + operation journal"]
+    Saved --> Review
+```
 
-## Architecture and access boundaries
+| Component | Implementation |
+| --- | --- |
+| Native browser experience | Manifest V3 extension; vanilla JavaScript, HTML/CSS, and Shadow DOM UI |
+| Orchestration | Node.js 22+ native HTTP, fetch, WebSocket, and filesystem APIs; local paired service on `127.0.0.1:4317` |
+| Reasoning | Azure Responses API; tested with `gpt-5.6-sol`, low reasoning effort, structured findings and action proposals |
+| Slack | Socket Mode events, bounded channel history, and reviewed Web API bot replies |
+| Google Docs | Authenticated text exports; exact approved editor changes through a Docs-restricted debugger bridge; no Google Cloud/Docs API setup |
+| Gmail | Content-script observation and exact editing of open composers, with save verification |
+| Action reliability | Source-version checks, unique exact targets, explicit approval, and a durable journal that prevents blind retries of uncertain actions |
 
-| Component | Implemented approach | Current boundary |
-| --- | --- | --- |
-| Browser extension | Manifest V3 content adapters, work-session popup, Shadow DOM review UI | Same installed browser profile; no mobile or cross-profile observation |
-| Local service | Native Node HTTP service, paired extension access, session state, bounded Azure analysis | Must be running locally; no hosted service |
-| Gmail | Observe the subject/body of open composers; recheck identity and exact text before a local edit | Reviewed edit, save indication, and reload persistence verified for the fixture; no inbox crawl, closed-draft monitoring, attachments, or email sending |
-| Google Docs | Authenticated plain-text export in the extension worker, bound to the actual sending Doc; native find/replace editor integration with a Docs-restricted debugger bridge | Fixture read, reviewed save, and reload persistence verified; multi-tab coverage and broader editor reliability remain unverified; observations are partial |
-| Slack | Socket Mode events, recent allowed-channel history, edited/deleted messages, reviewed posts | At most 15 initial messages per channel; older thread replies and file contents are not backfilled |
-| Operation journal | Serialized, checksum-protected atomic persistence of operation status | Interrupted queued/running operations recover as uncertain and are never replayed automatically |
+The model proposes; the service validates and dispatches only approved actions. LivingThread's runtime uses its own integrations and does not depend on the development assistant's browser-control tools. [Architecture, privacy, and failure handling](docs/ARCHITECTURE.md).
 
-The current Docs implementation uses the signed-in browser and does not require Google Cloud/OAuth setup. The live fixture passed authenticated reading, the exact reviewed edit, saved-result verification, and a fresh read after reload. This is one acceptance case rather than proof of general editor reliability. Successful exports are cached for 30 seconds while idle, with relevant saved-change/explicit refreshes and a 60-second backoff after a 429 response. These limits reduce repeated requests and do not imply continuous document freshness.
-
-The extension requests `debugger` permission for the experimental Docs editor bridge. The bridge restricts target pages and supported commands and detaches after each command. The browser may display its debugger permission/attachment notice; this is not hidden from the user.
-
-## Privacy, scope, and failure behavior
-
-- Starting a session enables observation of matching open Google Docs pages and Gmail composers in the installed profile, plus the configured Slack channels. **The first version does not yet provide per-account or per-document exclusion controls.** Keep unrelated sensitive pages outside the demo profile/session.
-- Observed text, source titles/URLs, limited application context, and user clarifications are sent to the configured Azure model. This is not an entirely offline product. Requests specify `store: false`; that flag does not replace the Azure resource's own data-handling settings.
-- Observations and findings live in service memory. `.runtime/` contains private pairing information, operation metadata/status, and local connection diagnostics. The extension stores its local pairing token in browser storage. `.env` and `.runtime/` are ignored by Git.
-- Pausing does not erase already observed information or undo an operation that has already started. Closing a page or losing Slack connectivity makes its cached evidence non-live. A later snapshot cannot establish changes in content the adapter did not observe.
-- Every proposed edit requires a unique exact target and version checks. The service records attempts before dispatch. A timeout or unverifiable result is **uncertain**, not success; inspect the actual target before taking further action. The journal is kept across restarts to prevent blind retries.
-- Read-only model analysis retries a timeout or transport failure at most once after two seconds. Pausing cancels the active analysis and pending retry. Validation/refusal/HTTP failures are not retried automatically. A model-check failure remains separate from an already verified editor save.
-- The model's analysis is bounded to 40 sources, 50,000 characters per source, and 160,000 characters total. Exceeding a bound reports an error rather than silently claiming all content was checked. Long-running sessions and broad workspaces are not yet supported.
-
-## Verification
-
-Run the local automated suite and syntax/manifest checks from the repository root:
+## Verification and prototype limits
 
 ```sh
 node --test tests/*.test.mjs
 node scripts/check.mjs
 ```
 
-The latest full suite passed **104/104 automated tests** across semantic validation, state/action preconditions, Gmail helper behavior, Slack transport, operation persistence, extension boundaries, Docs read policy, and local HTTP behavior. This includes stale-history recovery, an unresponsive state recipient, old snapshot ordering, and exact remote-action receipt delivery. Earlier full/focused checkpoint counts overlap and are not additive. Synthetic tests are separate from the real saved-write and reload checks recorded in [live acceptance](docs/LIVE_ACCEPTANCE.md).
+**104 automated tests passed**, covering state and action validation, persistence, transport, browser boundaries, and UI behavior. Separately, **12 recorded Azure evaluation calls across 7 unique synthetic cases passed**. These are focused checks, not a general accuracy benchmark.
 
-To run the current synthetic cases against the real configured Azure deployment:
+Live acceptance includes actual observation, a native notice, approved Docs/Gmail writes, verification after reloading both applications, and a separately approved Slack bot reply. The published demo also records the intentional-arrival clarification and its successful Gmail save. [Detailed evidence and earlier fixes](docs/LIVE_ACCEPTANCE.md).
 
-```sh
-node scripts/evaluate.mjs
-```
+This is a local desktop hackathon prototype. Docs coverage is partial; complex and multi-tab documents are unverified. Gmail observes open composers only. Slack initially reads at most 15 recent messages per channel and does not backfill older thread replies. Per-document/account exclusions and cross-profile/mobile support are not implemented. No continuous-monitoring or general production-reliability claim is made.
 
-This uses your Azure budget and writes a report to [SEMANTIC_EVALUATION.json](docs/SEMANTIC_EVALUATION.json). The initial September 12 run passed five cases: confirmed venue change, pre-existing conflict, legitimate time differences, tentative proposal, and unrelated events. Live checks exposed false positives from compatible differences in specificity and explicitly superseded Slack history. General prompt corrections were checked with seven follow-up calls, including compatible baselines, confirmed changes, and resolved changes with history. All passed: **twelve real Azure evaluation calls across seven unique cases**. This count excludes normal live analysis calls and does not measure general reliability or complete observation-to-notice delay.
+## Built during the hackathon
 
-Actual personal-account Docs/Gmail observations, Slack event receipt, automatic association, the native Gmail notice, two approved saved edits, persistence after reloading both apps, and final resolution have passed for the dedicated fixture. The original time, presenter, and remaining text were preserved. After a service restart and fresh observation of all four sources, the live resolved-state analysis completed in 2,495 ms with no findings; that is model-check time, not complete workflow latency. Review-result continuity is verified in the actual UI; Gmail receipt recovery after a full page reload remains unsupported. A separate pending-time scenario passed a reviewed Slack bot reply and a subsequent check that retained the existing time without proposing a duplicate question. An unresponsive Docs state recipient temporarily delayed the originating Gmail receipt; refreshing that page released the wait and displayed the successful result without resending. v0.1.5 makes state notifications nonblocking and acknowledges them explicitly. A transient model timeout was shown separately from successful saved edits. The development assistant created the two original Slack fixtures as the user and clicked the product's reviewed controls under authorization. LivingThread itself observed, executed, and verified the product actions.
+All LivingThread-specific implementation was created during the event, starting **September 12, 2026 at 10:54 HKT**, after the participant confirmed the official hackathon had begun. Earlier work consisted of concept documents, written scenarios, and generic account/API readiness checks. **OpenAI Codex assisted implementation, debugging, testing, documentation, and demo production.** [Build provenance](docs/BUILD_PROVENANCE.md).
 
-## Project documents
-
-- [LivingThread concept and current direction](docs/LIVINGTHREAD_CONCEPT.md)
-- [MVP proposal, open decisions, and acceptance scenarios](docs/MVP_PROPOSAL.md)
-- [Pre-event readiness and verified local environment](docs/PRE_EVENT_READINESS.md)
-- [Azure checks and initial model selection](docs/MODEL_READINESS.md)
-- [Browser and account checks](docs/BROWSER_READINESS.md)
-- [English demo cases and expected behavior](docs/DEMO_CASES.md)
-- [Current module interfaces](docs/IMPLEMENTATION_CONTRACT.md)
-- [Slack installation and scope](docs/SLACK_SETUP.md)
-- [Owner setup steps: accounts and personal authorization](docs/OWNER_SETUP_STEPS.md)
-- [Preparation and build provenance](docs/BUILD_PROVENANCE.md)
-- [Project instructions](AGENTS.md)
-- [Event brief and submission checklist](docs/EVENT_BRIEF.md)
-- [Initial product directions](docs/PRODUCT_DIRECTIONS.md)
-- [Second ideation pass: distinct interaction mechanisms](docs/IDEATION_02.md)
-- [Third ideation pass: recurring problems and existing alternatives](docs/IDEATION_03.md)
-
-Communication with the project owner is in Chinese. Project materials and the product itself are in English.
-
-## Sources and timing
-
-- [Hackathon handbook](https://hong-kong.aitinkerers.org/hackathons/h_5fqVrXbED6w/handbook)
-- [Hong Kong chapter event listing](https://hong-kong.aitinkerers.org/)
-
-The public chapter listing shows September 12, 2026, 10:00-17:00 HKT. The authenticated portal and handbook were read on September 11: the submission deadline is September 12 at 17:00 HKT, and the schedule labels 11:15-15:30 as Build. The complete eligibility window is not explicitly defined there. Aim to have a demonstrable build by 15:00 and submission materials ready by 15:30; these are planning targets, not additional event rules. See the event brief for the differing published local presentation times.
+For review, start with this README, the [video](https://youtu.be/GGgn0UvC4n0), and the [project description](docs/PROJECT_DESCRIPTION.md). The [documentation index](docs/README.md) separates current implementation guides from historical planning notes.

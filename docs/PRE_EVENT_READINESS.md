@@ -1,5 +1,7 @@
 # Pre-Event Readiness
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 Prepared September 11, 2026. Local tooling checked at 14:15 UTC / 22:15 HKT. This checklist records preparation and factual dependencies; it does not claim that product integrations work.
 
 ## Product decisions are sufficient

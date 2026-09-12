@@ -1,5 +1,7 @@
 # Ideation 03: Recurring Problems and Existing Alternatives
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 Status: Discussion only; no selection or core implementation. Sources checked September 11, 2026. Market comparisons are a limited initial scan, not an exhaustive novelty assessment.
 
 Subsequent owner feedback: LivingCopy was endorsed for deeper exploration and the project is now named LivingThread. The concept now includes changes in any connected representation and conflicts between independently expressed information, extending this pass's source-to-copy framing. See [the current concept](LIVINGTHREAD_CONCEPT.md). The ideas below retain their original brainstorming names as historical alternatives.

@@ -7,7 +7,7 @@
 - Treat it as a product prototype and demo project, even though its parent directory is named Research.
 - Keep work inside this project directory unless the user requests otherwise.
 - Discuss the project with the user in Chinese. Write project artifacts, source comments, UI copy, documentation, and submission materials in English.
-- Current project name: LivingThread. Follow `docs/LIVINGTHREAD_CONCEPT.md` for the owner's endorsed direction and distinguish it from earlier brainstorming under the name LivingCopy. Final implementation scope remains open.
+- Current project name: LivingThread. The working hackathon prototype is v0.1.5. Use `README.md`, `docs/SETUP.md`, and `docs/ARCHITECTURE.md` for current behavior; `docs/LIVINGTHREAD_CONCEPT.md` and earlier LivingCopy brainstorming are historical planning records.
 
 ## Working priorities
 
@@ -17,7 +17,7 @@
 - Choose architecture and tools after selecting the use case and checking integration access.
 - Distinguish working integrations, planned functionality, and mocked demo data in documentation.
 - Treat planning ideas as proposals unless explicitly marked as owner-confirmed decisions.
-- The owner has endorsed automatic relationship discovery within an explicitly authorized work session. Mandatory per-resource enrollment is superseded. Exact permission mechanics and session settings remain implementation details to validate.
+- The owner has endorsed automatic relationship discovery within an explicitly authorized work session. Mandatory per-resource enrollment is superseded. Current work-session scope and permission boundaries are documented in `docs/ARCHITECTURE.md`.
 - The owner accepts the venue-change example, reviewed correction loop, and contextual cross-app follow-through, including appropriate document updates and authorized Slack communication. Distinguish valid differences, actual changes, and pending agreements; do not reduce every explanation to a mute.
 - Keep observation permissions separate from action authorization. Product discussion of Slack communication is not authorization to send messages now.
 - During ideation, explore beyond familiar platform categories. The owner wants concrete, creative interaction mechanisms with a visible advantage over assigning a task to a general-purpose agent such as Codex.

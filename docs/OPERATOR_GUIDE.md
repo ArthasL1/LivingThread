@@ -2,7 +2,9 @@
 
 Use this runbook to rehearse and record the real Slack → Google Docs → Gmail venue-change workflow. The operator posts the fixture messages in Slack; LivingThread discovers the connection, proposes two edits, and executes only the edits you approve. No email is sent.
 
-The central story is **an agent showing up where work is already happening**. Configure and start the session before the final recording. Keep the confirmed Slack change → return to Gmail → automatic notice in one continuous segment wherever practical. The operator does not first notice the error, open an assistant chat, request a comparison, or enroll the individual resources. Show those facts through the interaction, then show the evidence and reviewed action. The full English voiceover is in [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
+**Published demonstration:** the [final 1:57 video](https://youtu.be/GGgn0UvC4n0) uses the Harbor fixture, returns to Docs for the initial notice, and includes a later intentional-difference continuation. This runbook's original venue-only pacing is a rehearsal option, not the final video's shot list. See [VIDEO_EDIT.md](VIDEO_EDIT.md) for the actual timeline and section 7 below for the optional continuation.
+
+The central story is **an agent showing up where work is already happening**. Configure and start the session before the final recording. Keep the confirmed Slack change → return to the affected document or draft → automatic notice in one continuous segment wherever practical. The operator does not first notice the error, open an assistant chat, request a comparison, or enroll the individual resources. Show those facts through the interaction, then show the evidence and reviewed action. [DEMO_SCRIPT.md](DEMO_SCRIPT.md) retains the original recording plan.
 
 The UI labels below come from v0.1.5. Model-written summaries and replacement wording vary. “Expected” describes a checkpoint to verify, not a claim that your next take has already passed. Previous live results are recorded separately in [LIVE_ACCEPTANCE.md](LIVE_ACCEPTANCE.md).
 
@@ -30,7 +32,7 @@ Open one pack and copy its English blocks into the indicated applications. Do no
 
 Each uses 15:00–15:30 HKT, a third-floor baseline, a confirmed move to Level 5, Room 502, Jamie as presenter, and Morgan as customer. The packs supply the Slack baseline, Doc title/body, Gmail subject/body, and confirmed Slack update. Copy only the intended text block, not Markdown fences or section headings.
 
-The main recording is **venue change only**. Do not introduce the separate proposed-16:00-time branch, its draft, or clarification into these takes. Close old test Docs and composers before preparation. Retain real Slack history; a fresh event name and date distinguish each take.
+Each pack starts with the **venue-change workflow**. The published video then adds an intentional early-arrival clarification in the same event; the optional continuation is described in section 7. The separate proposed-16:00-time branch and its draft belong to an earlier coordination test and are not part of these packs. Close old test Docs and composers before preparation. Retain real Slack history; a fresh event name and date distinguish each take.
 
 ## 3. Start the local service and check the extension
 
@@ -114,7 +116,7 @@ The detailed Slack venue and the Doc/email's shorter “third floor” wording a
 
 ## 7. Shape the two-minute recording
 
-Prepare and verify the baseline before pressing Record. The first rehearsal is untimed: learn the buttons and finish the full flow before trying a two-minute take. For the final video, connection, account checks, and initial reading are completed off camera. Suggested pacing:
+Prepare and verify the baseline before pressing Record. The first rehearsal is untimed: learn the buttons and finish the full flow before trying a two-minute take. Connection, account checks, and initial reading can be completed off camera. The table is the original venue-only pacing suggestion; the published v2 instead reserves its last 36 seconds for an intentional-difference continuation and the closing card.
 
 | Time | Show |
 | --- | --- |
@@ -126,6 +128,17 @@ Prepare and verify the baseline before pressing Record. The first rehearsal is u
 | 1:50–2:00 | End with “Different apps. One living thread.” |
 
 These are recording targets, not latency promises. Keep a longer raw capture if necessary, then trim waiting while preserving the causal sequence; do not present edited waiting time as a measured response latency. The operator's two Slack fixture posts are distinct from any message sent by LivingThread. This take demonstrates reviewed editor changes, not a bot conversation or an email send.
+
+### Optional continuation: explain an intentional early arrival
+
+After the venue changes have saved and their finding has resolved, keep the same event and its confirmed 15:00–15:30 HKT demo time. This is a continuation of the current context, not a fresh-take reset.
+
+1. In the Gmail draft, change the apparent start time to **14:00** while retaining the event name and date. Leave the confirmed demo time in Docs unchanged. Wait for the saved draft and another LivingThread check.
+2. If a relevant time finding appears, open its evidence and select **This difference is intentional…**. Enter **Morgan should come 1 hour earlier**, then click **Reconsider with this context**. This explanation does not authorize an edit.
+3. Inspect the new interpretation and proposal. A useful clarification distinguishes **arrival at 14:00 HKT** from the **demo at 15:00–15:30 HKT**, preserving the confirmed venue and unrelated wording. Model wording may vary; do not approve a proposal that changes the official event time or unexpected resources.
+4. If the reviewed proposal is correct, approve the Gmail change once. Record the revised sentence and the successful saved-action receipt. Keep the message unsent.
+
+This sequence was captured in the owner's published demo: the model proposed clearer wording and the approved Gmail edit saved successfully. That recording establishes this case; it does not guarantee that every future explanation will produce the same wording or an edit proposal. Preserve the actual outcome in any new take.
 
 ## 8. Repeat safely with a fresh take
 

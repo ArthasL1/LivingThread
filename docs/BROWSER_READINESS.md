@@ -1,5 +1,7 @@
 # Browser and Account Readiness
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 Checked September 11, 2026 through the existing Edge Profile 1 control connection. These are ordinary account/editor checks, not LivingThread extension tests. Browser control briefly failed to load its request-header policy and recovered on retry.
 
 Account update: the owner subsequently switched Gmail and Docs from the school account used below to a personal account. The personal account is now the intended Google account for development and demonstration. This switch is owner-reported; the old editing results remain historical and do not establish access under the new account. Verify the active account before future writes. Do not assume browser account-slot numbers identify the intended person, or automatically migrate/share school-account artifacts.

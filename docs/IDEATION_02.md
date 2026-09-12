@@ -1,5 +1,7 @@
 # Ideation 02: Distinct Interaction Mechanisms
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 Status: Discussion proposals only. No product has been selected or implemented. These are design hypotheses, not claims of market originality or verified feasibility.
 
 Owner review: The mechanisms demonstrated meaningful differentiation, but the scenarios felt too constructed or restrictive. The next pass must retain differentiation while grounding it in recurring user problems and accounting for setup effort. See [Ideation 03](IDEATION_03.md).

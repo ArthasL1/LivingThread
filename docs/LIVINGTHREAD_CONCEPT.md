@@ -1,5 +1,7 @@
 # LivingThread: Current Product Concept
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 **Different apps. One living thread.**
 
 Status: Direction endorsed by the owner, including automatic discovery within an authorized work session, the venue-change demonstration, and reviewed cross-app follow-through. Exact permission mechanics, UI details, and adapter behavior remain to be validated. No core functionality is implemented.

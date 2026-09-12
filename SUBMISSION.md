@@ -1,75 +1,48 @@
-# LivingThread — Submission draft
+# LivingThread — Agents Everywhere
 
-**Submission materials; portal status requires confirmation.** The real venue-change workflow has passed live acceptance, including both saved edits and reload persistence. A 1:57 English demo now also shows an intentional arrival-time difference, its clarified wording, and a successful Gmail save. Team details are owner-confirmed. Public repository visibility, video/social publication, and portal submission require fresh confirmation.
+**Different apps. One living thread.**
 
-## Project title
-
-**LivingThread**
-
-*Different apps. One living thread.*
-
-## Written description
-
-Use the [copy-ready Project Description](docs/PROJECT_DESCRIPTION.md) for the portal. It covers the problem, why the cross-app environment matters, automatic in-page intervention, intentional differences, technical implementation, and validated behavior. Its examples match the [recommended 1:57 demo edit](docs/VIDEO_EDIT.md).
-
-## Why this environment matters
-
-The useful moment is when someone is about to carry an outdated detail into another tool. Gmail supplies the current composition context, Docs contains the maintained brief, and Slack supplies the surrounding discussion and confirmation. Different wording can refer to the same real arrangement; different numbers can also be legitimate when the audience or purpose differs.
-
-LivingThread uses that cross-app context to decide whether an inconsistency needs attention and puts the evidence beside the relevant work. The user can then approve precise actions against the actual document, draft, or conversation. A separate chat window would require the user to first notice the issue and assemble the relevant sources; LivingThread's intended interaction begins before that explicit comparison request.
-
-## Implementation
-
-| Area | Stack and approach |
+| Submission item | Current material |
 | --- | --- |
-| In-place experience | Manifest V3 Chromium extension, plain JavaScript, Shadow DOM notice/review panel |
-| Local orchestration | Node.js 22+ built-ins, local HTTP service, paired extension access, explicit work-session state |
-| Reasoning | Azure Responses API, initial `gpt-5.6-sol` deployment with low reasoning effort, structured findings and action proposals |
-| Gmail | Current-composer subject/body observations and exact local edits; no email sending |
-| Google Docs | Experimental authenticated text export and native find/replace integration using a Docs-restricted debugger bridge |
-| Slack | Allowlisted channels, Socket Mode, bounded recent history, edited/deleted messages, reviewed bot posting |
-| Action control | Grounded quotes, unique exact targets, version checks, per-operation results, durable journal and uncertain-outcome recovery |
+| Project and team | **LivingThread** |
+| Participant | **Zeqi Li**, sole human team member |
+| Public repository | [ArthasL1/LivingThread](https://github.com/ArthasL1/LivingThread) — anonymous GitHub API access verified on September 12, 2026 |
+| Demo | [Watch on YouTube](https://youtu.be/GGgn0UvC4n0) — published video supplied by the participant; recommended edit is **1:57**, English narration and captions |
+| Description | [Copy-ready project description](docs/PROJECT_DESCRIPTION.md) |
+| Runtime demonstrated | **v0.1.5**; runtime source matches commit [0e1f6c0](https://github.com/ArthasL1/LivingThread/commit/0e1f6c0). Subsequent work prepared documentation and the video. |
+| Social post | LinkedIn copy prepared; public post URL has not yet been supplied in this workspace |
+| Portal submission | Completion has not yet been confirmed in this workspace |
 
-The model proposes actions and does not execute tools directly. The prototype uses no third-party npm runtime package. The repository includes installation instructions, synthetic tests, and an English demo rehearsal script.
+## Project description
 
-## Validation and current limitations
+LivingThread connects related information across Slack, Google Docs, and Gmail, notices meaningful inconsistencies, and shows up inside the affected document or draft. Users review the evidence and exact proposed actions before the agent changes anything.
 
-At the recorded development checkpoint, **104 automated tests passed**. Real Azure evaluation covers confirmed venue change, pre-existing conflict, legitimate time differences, a tentative proposal, unrelated events, compatible differences in specificity, and resolved changes with retained conversation history. The initial five cases and seven follow-up calls passed their expectations. These are focused regressions, not a general accuracy benchmark. See the [evaluation report](docs/SEMANTIC_EVALUATION.json).
+The [full project description](docs/PROJECT_DESCRIPTION.md) covers functionality, environment-specific value, innovation, technical execution, and user control. The [README](README.md) provides a visual overview and installation entry point.
 
-Real extension pairing, session activation, Slack event delivery, Docs/Gmail observations, automatic in-page notice, reviewed edits, application save confirmation, and post-reload persistence are verified for the synthetic venue-change scenario. A separate pending-time scenario also passed reviewed Slack bot delivery: after audience clarification and the owner's exact-message approval, LivingThread posted a question in the correct thread and retained the confirmed arrangement. The subsequent check proposed no duplicate question. A blocked page notification delayed the Gmail receipt; it appeared after the test Doc was refreshed, without resending. v0.1.5 includes a tested fix that keeps state notifications from blocking service checks. See [live acceptance](docs/LIVE_ACCEPTANCE.md). The [two-minute script](docs/DEMO_SCRIPT.md) remains a recording plan.
+## Team contributions
 
-The current prototype requires a local running service and the installed browser profile. An enabled session observes matching open Docs pages and Gmail composers plus configured Slack channels; per-document and per-account exclusion controls are not yet implemented. Closed or unavailable sources are not treated as fresh. Slack history is bounded and older thread replies are not backfilled. Docs multi-tab coverage and complex-document behavior remain experimental; saved editing is verified for the short live fixture. Model analysis has bounded input size.
+**Zeqi Li — Solo team member, LivingThread**
 
-Observed text and limited source context are sent to the configured Azure deployment. Credentials remain in local service configuration; local pairing and operation records are private runtime files. Each actual edit or Slack message requires an explicit review. An uncertain action is not automatically replayed after a restart. The demonstration uses fictional business details inside real applications; test fixtures are not substituted for runtime reasoning.
+Led product direction, scope, interaction design, and demo storytelling. Prepared the application accounts and test scenarios, performed hands-on testing across Slack, Google Docs, and Gmail, validated the agent's behavior, and recorded the live demonstration.
 
-## Build eligibility and provenance
+Used **OpenAI Codex** extensively for AI-assisted implementation, debugging, automated testing, documentation, and demo production.
 
-Core implementation began **September 12, 2026 at 02:54 UTC / 10:54 HKT**, after the owner confirmed the official hackathon had started. Pre-event work consisted of concept discussion, documentation, account/environment checks, generic API readiness tests, and written synthetic scenarios. The extension, adapters, semantic instructions/validation, orchestration, review UI, operation journal, and product tests were written during the event.
+The project uses **Azure OpenAI's Responses API with gpt-5.6-sol** for contextual reasoning and structured action proposals; **Slack Socket Mode and the Slack Web API** for channel events and approved messages; and **Chromium Manifest V3 extension APIs** for in-page interaction. Gmail integration operates on open drafts through content scripts, while Google Docs integration uses authenticated text exports and approved editor actions through the browser debugger API.
 
-Existing building blocks are the JavaScript/Node/browser runtimes, Azure models, and the Slack/Google applications and APIs. They are not claimed as original project inventions. See [build provenance](docs/BUILD_PROVENANCE.md) for the detailed record.
+## Prior work
 
-## Submission fields to complete
+Before the hackathon, we discussed the product concept, documented intended workflows, and prepared written demo scenarios. We also checked development tools, account access, basic browser editing, and generic model API connectivity. These were preparation activities; no LivingThread extension, backend, application adapters, or core agent functionality existed before the event.
 
-| Required field | Draft/status |
-| --- | --- |
-| Title | LivingThread |
-| Written description | [Copy-ready portal description](docs/PROJECT_DESCRIPTION.md), matched to observed behavior and demo v2 |
-| Public GitHub repository | [ArthasL1/LivingThread](https://github.com/ArthasL1/LivingThread); code pushed, currently Private. Public visibility is required before submission |
-| Two-minute video | TODO: upload the verified demo and insert its public URL; confirm duration ≤ 2:00 |
-| Social post | TODO: publish after final review, using verified partner handles; insert public post URL |
-| Team name | LivingThread — confirmed by the owner |
-| Team member | Zeqi Li — sole participant, confirmed by the owner; portal entry still pending |
-| Final validated revision | TODO: record the revision shown in the final video |
-| Portal submission confirmation | TODO: record only after actual submission |
+All LivingThread-specific implementation was created during the hackathon, beginning on September 12, 2026, at 10:54 HKT. This includes the browser extension, local Node.js service, Slack/Gmail/Google Docs integrations, semantic reasoning instructions, automatic conflict detection, in-page review interface, approved action execution, save verification, operation journal, and automated tests.
 
-## Social copy draft
+We used existing building blocks: Node.js, Chromium extension APIs, Azure-hosted models, and Slack and Google applications and APIs. OpenAI Codex assisted development during the event. No pre-existing LivingThread application or application starter code was reused. [Detailed provenance](docs/BUILD_PROVENANCE.md).
 
-**Do not publish until the live demo is validated and the handles/links are filled.**
+## Review evidence
 
-> I built LivingThread at Agents Everywhere: an agent that connects related details across Slack, Google Docs, and Gmail, surfaces inconsistencies where you work, and helps you review the right updates. Different apps. One living thread.
->
-> Demo: [VIDEO URL] · Code: [PUBLIC REPOSITORY URL]
->
-> [VERIFIED EVENT AND PARTNER HANDLES]
+- [Published demonstration](https://youtu.be/GGgn0UvC4n0): a confirmed venue change, native intervention, two approved saves, and an intentional early-arrival clarification followed by an approved and verified Gmail rewrite.
+- [Live integration acceptance](docs/LIVE_ACCEPTANCE.md): actual adapter observation, writes, reload persistence, and a separately reviewed Slack bot reply.
+- [Automated tests](tests/): **104 passing tests**; synthetic checks are distinct from real application acceptance.
+- [Semantic evaluation report](docs/SEMANTIC_EVALUATION.json): **12 real Azure calls across 7 unique synthetic cases**, all meeting their recorded expectations.
+- [Architecture and limits](docs/ARCHITECTURE.md): current integration scope, approval boundaries, partial coverage, and uncertain-result recovery.
 
-No social post, message, or portal submission is authorized or performed by this draft. Final partner tags must match the actual event/platform instructions; do not invent handles.
+The demonstration uses fictional business details in real applications. No email is sent. The [video edit record](docs/VIDEO_EDIT.md) explains accelerated waits, reading holds, and continuation captures.

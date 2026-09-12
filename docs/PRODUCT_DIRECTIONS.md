@@ -1,5 +1,7 @@
 # Initial Product Directions
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 **Review status:** The owner found this first pass insufficiently concrete, creative, and differentiated from general-purpose agents. Its provisional recommendation is withdrawn. Retain these ideas as history, not as the current shortlist. See [the second ideation pass](IDEATION_02.md).
 
 These are original brainstorming proposals. None has been selected, implemented, or validated with users. Feasibility assessments are provisional and depend on team skills, integration access, and the event build window.

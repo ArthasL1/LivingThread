@@ -1,5 +1,7 @@
 # Event Brief
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 Prepared on September 11, 2026 from the project owner's handbook excerpt. The authenticated portal and handbook were subsequently read through the connected browser at approximately 15:03 UTC / 23:03 HKT that day, confirming the eligibility wording and submission requirements below.
 
 ## Theme

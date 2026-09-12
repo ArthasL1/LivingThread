@@ -1,5 +1,7 @@
 # Owner Setup Steps
 
+> **Historical planning/preparation record.** This file preserves its original checkpoint; pending or proposed items are not a statement of current functionality. For the implemented v0.1.5 prototype, see the [project README](../README.md), [setup guide](SETUP.md), and [live acceptance](LIVE_ACCEPTANCE.md).
+
 Purpose: minimize the owner's work to account access, identity verification, and decisions about terms, permissions, or expenditure. Routine application configuration, implementation, and testing remain the assistant's responsibility.
 
 ## Current actions after the September 11 checks

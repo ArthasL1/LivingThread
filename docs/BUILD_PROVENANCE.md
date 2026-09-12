@@ -2,7 +2,9 @@
 
 Core build start: **September 12, 2026, 02:54 UTC / 10:54 HKT**, after the owner explicitly confirmed that the official hackathon had started and authorized implementation and parallel module work.
 
-Status: the owner has reloaded v0.1.5 in Edge. The dedicated fixture passed actual observation, native notice, evidence review, approval, both saved edits, persistence after reload, and correct final resolution. A separate reviewed Slack bot reply also passed delivery and post-send interpretation. The public GitHub requirement remains pending because the uploaded repository is private. The latest full suite passed **104/104 tests**. Twelve recorded Azure evaluation calls across seven unique synthetic cases passed. This record separates preparation, existing building blocks, and code created during the event. It records the owner's start confirmation, not a separately obtained organizer timing ruling.
+Current status, September 12, 2026: v0.1.5 has passed the dedicated real-app venue-change workflow, including both saved edits, persistence after reload, and final resolution. A separate reviewed Slack bot reply passed delivery and post-send interpretation. The owner has made the [GitHub repository](https://github.com/ArthasL1/LivingThread) public and published the [1:57 demonstration](https://youtu.be/GGgn0UvC4n0), which also shows an intentional arrival-time difference, a reviewed clarification edit, and a successful Gmail save. The latest recorded full suite passed **104/104 tests**. Twelve recorded Azure evaluation calls across seven unique synthetic cases passed.
+
+This record separates preparation, existing building blocks, and code created during the event. It records the owner's start confirmation, not a separately obtained organizer timing ruling. Earlier private-repository observations in the chronological acceptance record have been superseded by a September 12 unauthenticated GitHub API check returning `private: false`. Publishing these assets does not establish that the event portal submission is complete.
 
 ## Preparation completed
 
@@ -34,16 +36,16 @@ When adding a third-party component later, record its name, upstream URL, exact 
 
 ## Core work created during the event
 
-| Area | Build status | Evidence to add |
+| Area | Build status | Evidence |
 | --- | --- | --- |
 | Real app observation and action adapters | Actual personal-account baseline reads verified: Gmail 238 characters, Docs 336 characters. Both product edits passed saved-state and fresh post-reload checks | [Gmail adapter](../extension/content/gmail.js), [Docs adapter](../extension/content/docs.js), [extension background](../extension/background.js), [live acceptance](LIVE_ACCEPTANCE.md) |
 | Work-session scope and automatic relationship discovery | Actual three-source compatible baseline returned zero findings; fourth source confirmed the venue change and produced one conflict with two Docs/Gmail replacements and no Slack action | [Live acceptance](LIVE_ACCEPTANCE.md), [local service](../server/main.mjs), [state](../server/state.mjs), [content runtime](../extension/content/runtime.js), [manifest](../extension/manifest.json) |
 | Semantic association and change/conflict interpretation | Compatible-specificity and superseded-history false positives corrected with general rules; regression calls and the actual final resolved-state check passed | [Agent](../server/agent.mjs), [evaluation harness](../scripts/evaluate.mjs), [fixtures](../tests/fixtures/semantic-cases.json), [actual evaluation report](SEMANTIC_EVALUATION.json) |
-| In-place evidence and action review interface | Native Gmail notice and **Apply 2 changes** approval used in the real flow; keeping results continuous through finding refresh is being refined | [In-page UI](../extension/content/ui.js), [popup](../extension/popup.html) |
+| In-place evidence and action review interface | Native notices, source evidence, and **Apply 2 changes** approval used in real applications; result continuity verified in v0.1.4 and state-delivery fixes checked in v0.1.5 | [In-page UI](../extension/content/ui.js), [popup](../extension/popup.html), [live acceptance](LIVE_ACCEPTANCE.md) |
 | Cross-app execution, verification, and recovery | Actual product Docs/Gmail edits succeeded and persisted after reload; exact original time, presenter, and remaining text preserved | [State/action checks](../server/state.mjs), [operation journal](../server/journal.mjs), [journal tests](../tests/journal.test.mjs), [live acceptance](LIVE_ACCEPTANCE.md) |
 | Bounded Slack coordination | Real Socket Mode receives the dedicated channel; a separately approved question was posted by LivingThread in the intended thread, verified in Slack, and followed by a pending finding with no duplicate question | [Slack adapter](../server/slack.mjs), [synthetic Slack tests](../tests/slack.test.mjs), [live acceptance](LIVE_ACCEPTANCE.md) |
 | Automated verification | Latest full suite: 104/104 passed. Earlier full and focused checkpoints overlap and are not additive | [Tests](../tests/), [syntax and manifest checks](../scripts/check.mjs) |
-| Demo, video, and submission artifacts | Core live fixture completed through resolution; final recording/submission pending. GitHub repository verified private, so public visibility is still required | [Demo cases](DEMO_CASES.md), [event requirements](EVENT_BRIEF.md), [live acceptance](LIVE_ACCEPTANCE.md) |
+| Demo, video, and submission artifacts | Owner recorded real application workflows; the final v2 video is 1:57 and published. The owner also confirmed the repository is public. Portal submission status remains separate | [Published demo](https://youtu.be/GGgn0UvC4n0), [edit record](VIDEO_EDIT.md), [event requirements](EVENT_BRIEF.md), [live acceptance](LIVE_ACCEPTANCE.md) |
 
 ## Recorded evaluation
 

@@ -1,6 +1,6 @@
 # LivingThread — Demo edit record
 
-The recommended review copy, **v2, is 1 minute 57 seconds**, exported at **1920 × 1080, 25 fps** as H.264/AAC MP4. It uses English male AI narration (`en-US-AndrewNeural`) and burned-in English captions, with a separate SRT and narration script. Publication and the entrant's review remain pending. The earlier 1:55 v1 remains available locally for comparison.
+The final **v2 demonstration is 1 minute 57 seconds** and is [published on YouTube](https://youtu.be/GGgn0UvC4n0). Its local master was exported at **1920 × 1080, 25 fps** as H.264/AAC MP4. It uses English male AI narration (`en-US-AndrewNeural`) and burned-in English captions, with a separate SRT and narration script. The earlier 1:55 v1 remains available locally for comparison; it is not the recommended submission cut.
 
 ## Actual recorded story
 
@@ -35,4 +35,4 @@ The intentional-difference case replaces v1's later Room 503 correction because 
 - Application footage comes from the supplied recordings. No findings, edits, or success receipts were generated for the video. Intro/outro cards and explanatory text are editorial graphics.
 - The source audio is replaced by generated narration. No email is sent in the demonstration.
 
-The original recordings, source hashes, edit decision list, rendering script, and intermediate files remain in ignored local directories. Review copies are in `artifacts/private/exports/`; they are not committed as public source assets.
+The original recordings, source hashes, edit decision list, rendering script, and intermediate files remain in ignored local directories. Local exports are in `artifacts/private/exports/`; these production files are not committed as public source assets. Judges can watch the published video directly without access to those private files.
